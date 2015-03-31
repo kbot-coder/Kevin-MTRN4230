@@ -1465,8 +1465,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-
 function edit28_Callback(hObject, eventdata, handles)
 % hObject    handle to edit28 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -1474,7 +1472,6 @@ function edit28_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of edit28 as text
 %        str2double(get(hObject,'String')) returns contents of edit28 as a double
-
 
 % --- Executes during object creation, after setting all properties.
 function edit28_CreateFcn(hObject, eventdata, handles)
@@ -1488,8 +1485,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-
 function edit29_Callback(hObject, eventdata, handles)
 % hObject    handle to edit29 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -1497,7 +1492,6 @@ function edit29_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of edit29 as text
 %        str2double(get(hObject,'String')) returns contents of edit29 as a double
-
 
 % --- Executes during object creation, after setting all properties.
 function edit29_CreateFcn(hObject, eventdata, handles)
@@ -1510,8 +1504,6 @@ function edit29_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
 
 function edit30_Callback(hObject, eventdata, handles)
 % hObject    handle to edit30 (see GCBO)
