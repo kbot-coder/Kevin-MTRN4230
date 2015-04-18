@@ -1,28 +1,4 @@
 function varargout = GUI_Design_2015_04_8(varargin)
-% GUI_DESIGN_2015_04_8 MATLAB code for GUI_Design_2015_04_8.fig
-%      GUI_DESIGN_2015_04_8, by itself, creates a new GUI_DESIGN_2015_04_8 or raises the existing
-%      singleton*.
-%
-%      H = GUI_DESIGN_2015_04_8 returns the handle to a new GUI_DESIGN_2015_04_8 or the handle to
-%      the existing singleton*.
-%
-%      GUI_DESIGN_2015_04_8('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in GUI_DESIGN_2015_04_8.M with the given input arguments.
-%
-%      GUI_DESIGN_2015_04_8('Property','Value',...) creates a new GUI_DESIGN_2015_04_8 or raises the
-%      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before GUI_Design_2015_04_8_OpeningFcn gets called.  An
-%      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to GUI_Design_2015_04_8_OpeningFcn via varargin.
-%
-%      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
-%      instance to run (singleton)".
-%
-% See also: GUIDE, GUIDATA, GUIHANDLES
-
-% Edit the above text to modify the response to help GUI_Design_2015_04_8
-
-% Last Modified by GUIDE v2.5 14-Apr-2015 18:45:13
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -53,14 +29,17 @@ function GUI_Design_2015_04_8_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to GUI_Design_2015_04_8 (see VARARGIN)
 
 % Choose default command line output for GUI_Design_2015_04_8
+
+% Set All Handles Variable
+handles.ConveyorEnable = 1;
+
 handles.output = hObject;
 
 %---------------------------------------------------
-
-set(findall(handles.ConveyorEnable, '-property', 'enable'), 'enable', 'off')
-set(findall(handles.ConveyorDirection, '-property', 'enable'), 'enable', 'off');
-set(findall(handles.VacumPump, '-property', 'enable'), 'enable', 'off');
-set(findall(handles.SolenoidValve, '-property', 'enable'), 'enable', 'off');
+set(findall(handles.ConvEnable, '-property', 'enable'), 'enable', 'off');
+set(findall(handles.ConvDirection, '-property', 'enable'), 'enable', 'off');
+set(findall(handles.VacPump, '-property', 'enable'), 'enable', 'off');
+set(findall(handles.SolValve, '-property', 'enable'), 'enable', 'off');
 set(findall(handles.JointPositionInput, '-property', 'enable'), 'enable', 'off');
 set(findall(handles.EndEffectorGoal, '-property', 'enable'), 'enable', 'off');
 
@@ -70,6 +49,7 @@ handles.timer= timer(...
     'ExecutionMode', 'fixedRate', ...       % Run timer repeatedly
     'Period', 0.1, ...                        % Initial period is 1 sec.
     'TimerFcn', {@Changedisplay,hObject,handles}); % Specify callback function
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -472,18 +452,18 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 
 
 
-function Input_Joint_1_Callback(hObject, eventdata, handles)
-% hObject    handle to Input_Joint_1 (see GCBO)
+function Joint_Angle_1_Callback(hObject, eventdata, handles)
+% hObject    handle to Joint_Angle_1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of Input_Joint_1 as text
-%        str2double(get(hObject,'String')) returns contents of Input_Joint_1 as a double
+% Hints: get(hObject,'String') returns contents of Joint_Angle_1 as text
+%        str2double(get(hObject,'String')) returns contents of Joint_Angle_1 as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function Input_Joint_1_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Input_Joint_1 (see GCBO)
+function Joint_Angle_1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Joint_Angle_1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -518,18 +498,18 @@ end
 
 
 
-function Input_Joint_6_Callback(hObject, eventdata, handles)
-% hObject    handle to Input_Joint_6 (see GCBO)
+function Joint_Angle_6_Callback(hObject, eventdata, handles)
+% hObject    handle to Joint_Angle_6 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of Input_Joint_6 as text
-%        str2double(get(hObject,'String')) returns contents of Input_Joint_6 as a double
+% Hints: get(hObject,'String') returns contents of Joint_Angle_6 as text
+%        str2double(get(hObject,'String')) returns contents of Joint_Angle_6 as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function Input_Joint_6_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Input_Joint_6 (see GCBO)
+function Joint_Angle_6_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Joint_Angle_6 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -541,18 +521,18 @@ end
 
 
 
-function Input_Joint_2_Callback(hObject, eventdata, handles)
-% hObject    handle to Input_Joint_2 (see GCBO)
+function Joint_Angle_2_Callback(hObject, eventdata, handles)
+% hObject    handle to Joint_Angle_2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of Input_Joint_2 as text
-%        str2double(get(hObject,'String')) returns contents of Input_Joint_2 as a double
+% Hints: get(hObject,'String') returns contents of Joint_Angle_2 as text
+%        str2double(get(hObject,'String')) returns contents of Joint_Angle_2 as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function Input_Joint_2_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Input_Joint_2 (see GCBO)
+function Joint_Angle_2_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Joint_Angle_2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -564,18 +544,18 @@ end
 
 
 
-function Input_Joint_4_Callback(hObject, eventdata, handles)
-% hObject    handle to Input_Joint_4 (see GCBO)
+function Joint_Angle_4_Callback(hObject, eventdata, handles)
+% hObject    handle to Joint_Angle_4 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of Input_Joint_4 as text
-%        str2double(get(hObject,'String')) returns contents of Input_Joint_4 as a double
+% Hints: get(hObject,'String') returns contents of Joint_Angle_4 as text
+%        str2double(get(hObject,'String')) returns contents of Joint_Angle_4 as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function Input_Joint_4_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Input_Joint_4 (see GCBO)
+function Joint_Angle_4_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Joint_Angle_4 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -587,18 +567,18 @@ end
 
 
 
-function Input_Joint_5_Callback(hObject, eventdata, handles)
-% hObject    handle to Input_Joint_5 (see GCBO)
+function Joint_Angle_5_Callback(hObject, eventdata, handles)
+% hObject    handle to Joint_Angle_5 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of Input_Joint_5 as text
-%        str2double(get(hObject,'String')) returns contents of Input_Joint_5 as a double
+% Hints: get(hObject,'String') returns contents of Joint_Angle_5 as text
+%        str2double(get(hObject,'String')) returns contents of Joint_Angle_5 as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function Input_Joint_5_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to Input_Joint_5 (see GCBO)
+function Joint_Angle_5_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Joint_Angle_5 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -933,48 +913,33 @@ set ( handles.CmdStatus, 'String' , 'Move End Efector Robot Linear Mode Into Y+ 
 
 
 
-% --- Executes on button press in radiobutton9.
-function radiobutton9_Callback(hObject, eventdata, handles)
-% hObject    handle to radiobutton9 (see GCBO)
+% --- Executes on button press in ConvEnableOn.
+function ConvEnableOn_Callback(hObject, eventdata, handles)
+% hObject    handle to ConvEnableOn (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of radiobutton9
+% Hint: get(hObject,'Value') returns toggle state of ConvEnableOn
 
 
-% --- Executes on button press in radiobutton10.
-function radiobutton10_Callback(hObject, eventdata, handles)
-% hObject    handle to radiobutton10 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% --- Executes on button press in ConvEnableOff.
+function ConvEnableOff_Callback(hObject, eventdata, handles)
+% Hint: get(hObject,'Value') returns toggle state of ConvEnableOff
 
-% Hint: get(hObject,'Value') returns toggle state of radiobutton10
 
 
 % --- Executes on button press in radiobutton11.
 function radiobutton11_Callback(hObject, eventdata, handles)
-% hObject    handle to radiobutton11 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
 % Hint: get(hObject,'Value') returns toggle state of radiobutton11
 
 
 % --- Executes on button press in radiobutton12.
 function radiobutton12_Callback(hObject, eventdata, handles)
-% hObject    handle to radiobutton12 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
 % Hint: get(hObject,'Value') returns toggle state of radiobutton12
 
 
 % --- Executes on button press in radiobutton13.
 function radiobutton13_Callback(hObject, eventdata, handles)
-% hObject    handle to radiobutton13 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
 % Hint: get(hObject,'Value') returns toggle state of radiobutton13
 
 
@@ -1355,15 +1320,15 @@ function checkbox14_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 get(hObject,'Value')
 if get(hObject,'Value')==1,
-    set(findall(handles.ConveyorEnable, '-property', 'enable'), 'enable', 'on');
-    set(findall(handles.ConveyorDirection, '-property', 'enable'), 'enable', 'on');
-    set(findall(handles.VacumPump, '-property', 'enable'), 'enable', 'on');
-    set(findall(handles.SolenoidValve, '-property', 'enable'), 'enable', 'on');
+    set(findall(handles.ConvEnable, '-property', 'enable'), 'enable', 'on');
+    set(findall(handles.ConvDirection, '-property', 'enable'), 'enable', 'on');
+    set(findall(handles.VacPump, '-property', 'enable'), 'enable', 'on');
+    set(findall(handles.SolValve, '-property', 'enable'), 'enable', 'on');
 else
-    set(findall(handles.ConveyorEnable, '-property', 'enable'), 'enable', 'off')
-    set(findall(handles.ConveyorDirection, '-property', 'enable'), 'enable', 'off');
-    set(findall(handles.VacumPump, '-property', 'enable'), 'enable', 'off');
-    set(findall(handles.SolenoidValve, '-property', 'enable'), 'enable', 'off');
+    set(findall(handles.ConvEnable, '-property', 'enable'), 'enable', 'off')
+    set(findall(handles.ConvDirection, '-property', 'enable'), 'enable', 'off');
+    set(findall(handles.VacPump, '-property', 'enable'), 'enable', 'off');
+    set(findall(handles.SolValve, '-property', 'enable'), 'enable', 'off');
 end;
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox14
@@ -1456,22 +1421,44 @@ function SendOutput_Callback(hObject, eventdata, handles)
 % hObject    handle to SendOutput (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-set ( handles.CmdStatus, 'String' , 'Set Output Port (Conveyor Enable, Conveyor Direction, Vacuum Pump, Solenoid Valve)' ) ;
+switch get(get(handles.ConvEnable,'SelectedObject'),'Tag')
+    case 'ConvEnableOn',  CE='ON';
+    case 'ConvEnableOff', CE='OFF';
+end
+
+switch get(get(handles.VacPump,'SelectedObject'),'Tag')
+    case 'VacPumpOn',  VP='ONN';
+    case 'VacPumpOff', VP='OFF';
+end
+
+switch get(get(handles.ConvDirection,'SelectedObject'),'Tag')
+    case 'ConvDirectionFW',  CD='Forward';
+    case 'ConvDirectionBW', CD='Backward';
+end
+
+switch get(get(handles.SolValve,'SelectedObject'),'Tag')
+    case 'SolValveOn',  SV='ON';
+    case 'SolValveOff', SV='OFF';
+end
+
+% CALL FUNCTION ROBOT STUDIO
+CommandStatus = sprintf('Set Output Conveyor Enable = %d, Conveyor Direction = %str, Vacuum Pump = %str, Solenoid Valve = %str', CE, VP, CD, SV);
+set ( handles.CmdStatus, 'String' , CommandStatus ) ;
 
 
 
 function edit27_Callback(hObject, eventdata, handles)
-% hObject    handle to edit27 (see GCBO)
+% hObject    handle to Joint_Angle_1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit27 as text
-%        str2double(get(hObject,'String')) returns contents of edit27 as a double
+% Hints: get(hObject,'String') returns contents of Joint_Angle_1 as text
+%        str2double(get(hObject,'String')) returns contents of Joint_Angle_1 as a double
 
 
 % --- Executes during object creation, after setting all properties.
 function edit27_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit27 (see GCBO)
+% hObject    handle to Joint_Angle_1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1481,17 +1468,17 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-function edit28_Callback(hObject, eventdata, handles)
-% hObject    handle to edit28 (see GCBO)
+function Joint_Angle_3_Callback(hObject, eventdata, handles)
+% hObject    handle to Joint_Angle_3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit28 as text
-%        str2double(get(hObject,'String')) returns contents of edit28 as a double
+% Hints: get(hObject,'String') returns contents of Joint_Angle_3 as text
+%        str2double(get(hObject,'String')) returns contents of Joint_Angle_3 as a double
 
 % --- Executes during object creation, after setting all properties.
-function edit28_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit28 (see GCBO)
+function Joint_Angle_3_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Joint_Angle_3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1502,16 +1489,16 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 function edit29_Callback(hObject, eventdata, handles)
-% hObject    handle to edit29 (see GCBO)
+% hObject    handle to Joint_Angle_6 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit29 as text
-%        str2double(get(hObject,'String')) returns contents of edit29 as a double
+% Hints: get(hObject,'String') returns contents of Joint_Angle_6 as text
+%        str2double(get(hObject,'String')) returns contents of Joint_Angle_6 as a double
 
 % --- Executes during object creation, after setting all properties.
 function edit29_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit29 (see GCBO)
+% hObject    handle to Joint_Angle_6 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1522,17 +1509,17 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 function edit30_Callback(hObject, eventdata, handles)
-% hObject    handle to edit30 (see GCBO)
+% hObject    handle to Joint_Angle_2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit30 as text
-%        str2double(get(hObject,'String')) returns contents of edit30 as a double
+% Hints: get(hObject,'String') returns contents of Joint_Angle_2 as text
+%        str2double(get(hObject,'String')) returns contents of Joint_Angle_2 as a double
 
 
 % --- Executes during object creation, after setting all properties.
 function edit30_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit30 (see GCBO)
+% hObject    handle to Joint_Angle_2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1545,17 +1532,17 @@ end
 
 
 function edit31_Callback(hObject, eventdata, handles)
-% hObject    handle to edit31 (see GCBO)
+% hObject    handle to Joint_Angle_4 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit31 as text
-%        str2double(get(hObject,'String')) returns contents of edit31 as a double
+% Hints: get(hObject,'String') returns contents of Joint_Angle_4 as text
+%        str2double(get(hObject,'String')) returns contents of Joint_Angle_4 as a double
 
 
 % --- Executes during object creation, after setting all properties.
 function edit31_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit31 (see GCBO)
+% hObject    handle to Joint_Angle_4 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1568,17 +1555,17 @@ end
 
 
 function edit32_Callback(hObject, eventdata, handles)
-% hObject    handle to edit32 (see GCBO)
+% hObject    handle to Joint_Angle_5 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit32 as text
-%        str2double(get(hObject,'String')) returns contents of edit32 as a double
+% Hints: get(hObject,'String') returns contents of Joint_Angle_5 as text
+%        str2double(get(hObject,'String')) returns contents of Joint_Angle_5 as a double
 
 
 % --- Executes during object creation, after setting all properties.
 function edit32_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit32 (see GCBO)
+% hObject    handle to Joint_Angle_5 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1591,10 +1578,21 @@ end
 
 % --- Executes on button press in pushbutton21.
 function pushbutton21_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton21 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-set ( handles.CmdStatus, 'String' , 'Move In Jont Mode Into Each Joint Target Angle ' ) ;
+J1S = get(handles.Joint_Angle_1,'String');
+J1 = sscanf(J1S,'%d');
+J2S = get(handles.Joint_Angle_2,'String');
+J2 = sscanf(J2S,'%d');
+J3S = get(handles.Joint_Angle_3,'String');
+J3 = sscanf(J3S,'%d');
+J4S = get(handles.Joint_Angle_4,'String');
+J4 = sscanf(J4S,'%d');
+J5S = get(handles.Joint_Angle_5,'String');
+J5 = sscanf(J5S,'%d');
+J6S = get(handles.Joint_Angle_6,'String');
+J6 = sscanf(J6S,'%d');
+JointData = sprintf('Move In Jont Mode Into J1 = %d ; J2 = %d ; J3 = %d ; J4 = %d ; J5 = %d ; J6 = %d' , J1,J2,J3,J4,J5,J6);
+set ( handles.CmdStatus, 'String' , JointData ) ;
+% CALL FUNCTION FOR ROBOT STUDIO
 
 
 % --- Executes on key press with focus on figure1 or any of its controls.
@@ -1718,3 +1716,69 @@ imshow(imgTable);
 %    % We only update what is needed
 %    set(handlesRaw,'CData',IM);
 % end
+
+
+% --- Executes on button press in GetC_Coordinate.
+function GetC_Coordinate_Callback(hObject, eventdata, handles)
+% hObject    handle to GetC_Coordinate (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+[X,Y]=ginput(1);
+texboxStatus = sprintf('X = %d  Y = %d', X, Y);
+set(handles.C_Coordinate,'String',texboxStatus);
+
+
+
+function C_Coordinate_Callback(hObject, eventdata, handles)
+% hObject    handle to C_Coordinate (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of C_Coordinate as text
+%        str2double(get(hObject,'String')) returns contents of C_Coordinate as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function C_Coordinate_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to C_Coordinate (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in Get_T_Coordinate.
+function Get_T_Coordinate_Callback(hObject, eventdata, handles)
+% hObject    handle to Get_T_Coordinate (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+[X,Y] = ginput(1);
+texboxStatus = sprintf('X = %d  Y = %d', X, Y);
+set(handles.T_Coordinate,'String',texboxStatus);
+
+
+
+function T_Coordinate_Callback(hObject, eventdata, handles)
+% hObject    handle to T_Coordinate (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of T_Coordinate as text
+%        str2double(get(hObject,'String')) returns contents of T_Coordinate as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function T_Coordinate_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to T_Coordinate (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
