@@ -421,78 +421,81 @@ function uipanel2_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 
 % --- Executes on slider movement.
-function slider11_Callback(hObject, eventdata, handles)
+function Joint_1_Callback(hObject, eventdata, handles)
 set ( handles.CmdStatus, 'String' , 'Move Joint 1 to --- degree' ) ;
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+SliderValue = get(handles.Joint_1,'Value');
+set(Joint_Angle_1,'String',num2str(SliderValue));
+
 
 % --- Executes during object creation, after setting all properties.
-function slider11_CreateFcn(hObject, eventdata, handles)
+function Joint_1_CreateFcn(hObject, eventdata, handles)
 % Hint: slider controls usually have a light gray background.
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
 
 % --- Executes on slider movement.
-function slider12_Callback(hObject, eventdata, handles)
+function Joint_4_Callback(hObject, eventdata, handles)
 set ( handles.CmdStatus, 'String' , 'Move Joint 4 to --- degree' ) ;
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 
 % --- Executes during object creation, after setting all properties.
-function slider12_CreateFcn(hObject, eventdata, handles)
+function Joint_4_CreateFcn(hObject, eventdata, handles)
 % Hint: slider controls usually have a light gray background.
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
 
 % --- Executes on slider movement.
-function slider13_Callback(hObject, eventdata, handles)
+function Joint_5_Callback(hObject, eventdata, handles)
 set ( handles.CmdStatus, 'String' , 'Move Joint 5 to --- degree' ) ;
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 
 % --- Executes during object creation, after setting all properties.
-function slider13_CreateFcn(hObject, eventdata, handles)
+function Joint_5_CreateFcn(hObject, eventdata, handles)
 % Hint: slider controls usually have a light gray background.
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
 
 % --- Executes on slider movement.
-function slider14_Callback(hObject, eventdata, handles)
+function Joint_6_Callback(hObject, eventdata, handles)
 set ( handles.CmdStatus, 'String' , 'Move Joint 6 to --- degree' ) ;
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slide
 
 % --- Executes during object creation, after setting all properties.
-function slider14_CreateFcn(hObject, eventdata, handles)
+function Joint_6_CreateFcn(hObject, eventdata, handles)
 % Hint: slider controls usually have a light gray background.
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
 
 % --- Executes on slider movement.
-function slider15_Callback(hObject, eventdata, handles)
+function Joint_2_Callback(hObject, eventdata, handles)
 set ( handles.CmdStatus, 'String' , 'Move Joint 2 to --- degree' ) ;
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 
 % --- Executes during object creation, after setting all properties.
-function slider15_CreateFcn(hObject, eventdata, handles)
+function Joint_2_CreateFcn(hObject, eventdata, handles)
 % Hint: slider controls usually have a light gray background.
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
 
 % --- Executes on slider movement.
-function slider16_Callback(hObject, eventdata, handles)
+function Joint_3_Callback(hObject, eventdata, handles)
 set ( handles.CmdStatus, 'String' , 'Move Joint 3 to --- degree' ) ;
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 
 % --- Executes during object creation, after setting all properties.
-function slider16_CreateFcn(hObject, eventdata, handles)
+function Joint_3_CreateFcn(hObject, eventdata, handles)
 % Hint: slider controls usually have a light gray background.
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
@@ -640,15 +643,15 @@ end
 function GoByEndEffector_Callback(hObject, eventdata, handles)
 set ( handles.CmdStatus, 'String' , 'Move End Efector Robot Linear Mode Into Target ' ) ;
 
-% --- Executes on button press in checkbox16.
-function checkbox16_Callback(hObject, eventdata, handles)
+% --- Executes on button press in LinEnable.
+function LinEnable_Callback(hObject, eventdata, handles)
 get(hObject,'Value')
 if get(hObject,'Value')==1,
     set(findall(handles.EndEffectorGoal, '-property', 'enable'), 'enable', 'on');
 else
     set(findall(handles.EndEffectorGoal, '-property', 'enable'), 'enable', 'off');
 end;
-% Hint: get(hObject,'Value') returns toggle state of checkbox16
+% Hint: get(hObject,'Value') returns toggle state of LinEnable
 
 function edit14_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of edit14 as text
@@ -730,9 +733,9 @@ function GoByJoints_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 set ( handles.CmdStatus, 'String' , 'Move Robot In Axis Mode Into Axis Angle Target of Each Joint ' ) ;
 
-% --- Executes on button press in checkbox15.
-function checkbox15_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox15 (see GCBO)
+% --- Executes on button press in JointEnable.
+function JointEnable_Callback(hObject, eventdata, handles)
+% hObject    handle to JointEnable (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 get(hObject,'Value')
@@ -741,11 +744,11 @@ if get(hObject,'Value')==1,
 else
     set(findall(handles.JointPositionInput, '-property', 'enable'), 'enable', 'off');
 end;
-% Hint: get(hObject,'Value') returns toggle state of checkbox15
+% Hint: get(hObject,'Value') returns toggle state of JointEnable
 
-% --- Executes on button press in checkbox14.
-function checkbox14_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox14 (see GCBO)
+% --- Executes on button press in OutEnable.
+function OutEnable_Callback(hObject, eventdata, handles)
+% hObject    handle to OutEnable (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 get(hObject,'Value')
@@ -761,7 +764,7 @@ else
     set(findall(handles.SolValve, '-property', 'enable'), 'enable', 'off');
 end;
 
-% Hint: get(hObject,'Value') returns toggle state of checkbox14
+% Hint: get(hObject,'Value') returns toggle state of OutEnable
 
 function update_display(hObject,eventdata,hfigure,handles)
 % Timer timer1 callback, called each time timer iterates.
@@ -1073,9 +1076,18 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
+% --- Executes on button press in jogEnable.
+function jogEnable_Callback(hObject, eventdata, handles)
+% hObject    handle to jogEnable (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of jogEnable
+
+
 % --- Executes on slider movement.
-function slider17_Callback(hObject, eventdata, handles)
-% hObject    handle to slider17 (see GCBO)
+function slider19_Callback(hObject, eventdata, handles)
+% hObject    handle to slider19 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -1084,8 +1096,8 @@ function slider17_Callback(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
-function slider17_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to slider17 (see GCBO)
+function slider19_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to slider19 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1093,3 +1105,120 @@ function slider17_CreateFcn(hObject, eventdata, handles)
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
+
+
+% --- Executes on slider movement.
+function slider20_Callback(hObject, eventdata, handles)
+% hObject    handle to Joint_3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function slider20_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Joint_3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on slider movement.
+function slider21_Callback(hObject, eventdata, handles)
+% hObject    handle to Joint_4 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function slider21_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Joint_4 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on slider movement.
+function slider22_Callback(hObject, eventdata, handles)
+% hObject    handle to Joint_5 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function slider22_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Joint_5 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on slider movement.
+function slider23_Callback(hObject, eventdata, handles)
+% hObject    handle to Joint_6 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function slider23_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Joint_6 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on slider movement.
+function slider24_Callback(hObject, eventdata, handles)
+% hObject    handle to Joint_2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+
+% --- Executes during object creation, after setting all properties.
+function slider24_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to Joint_2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes during object creation, after setting all properties.
+function ChocTable_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to ChocTable (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
