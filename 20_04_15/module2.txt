@@ -1,0 +1,361 @@
+MODULE TASK2BITCH
+
+
+    ! The socket connected to the client.
+    VAR socketdev client_socket;
+    VAR bool checkpos:=FALSE;
+    VAR bool checkjoint:=FALSE;
+    VAR bool checkinput:=FALSE;
+    VAR bool checkmode:=FALSE;
+    VAR num size;
+    VAR string received_str;
+    
+    PERS pos position:=[175,520,147];
+    PERS robjoint jointpos:=[-50,10,-10,-30,50,-50];
+    PERS speeddata speed_value:=[1000,500,5000,1000];
+    PERS robjoint IO_signal :=[-50,10,-10,-30,50,-50];
+    PERS pos position_stop;
+    PERS robjoint jointpos_stop; 
+    PERS bool selected;
+    PERS num mode:=2;
+    PERS num wohoo:=1;
+    PERS num iO_yesno:=0;
+    PERS bool move_please := FALSE;
+    PERS bool startTask1:=FALSE;
+    PERS bool starter:= FALSE;
+    PERS bool start_IO:=FALSE;
+    PERS string last_spot;
+    PERS string signalstop:="";
+   
+    ! The host and port that we will be listening for a connection on.
+    CONST string host:="127.0.0.1";
+    CONST num port:=1025;
+
+
+    PROC MainServer()
+        
+         checkpos:=FALSE;
+         checkjoint:=FALSE;
+         checkinput:=FALSE;
+         checkmode:=FALSE;
+        
+        starter_func;
+     
+        ListenForAndAcceptConnection;
+
+        !Receive a string from the client.
+        SocketReceive client_socket\Str:=received_str;
+
+        ! Send the string back to the client, adding a line feed character.        
+        
+        bitchkachu received_str;
+        
+        modechecker mode;
+          
+        pleasebitch wohoo;
+        
+        IObitch; 
+
+        
+        CloseConnection;
+
+    ENDPROC
+
+PROC bitchkachu(string received_str)
+        size:=StrLen(received_str);
+        
+        IF size=1 THEN
+            
+            checkmode:=StrtoVal(received_str,mode);
+            wohoo :=0;
+            selected := FALSE;
+            
+        else
+            
+            checkpos:=StrtoVal(received_str,position);
+            checkjoint:= StrToVal(received_str,jointpos);
+            checkinput:=StrToVal(received_str,IO_signal);
+            selected:=TRUE;
+            
+        ENDIF
+        
+        IF size = 2 THEN
+            
+            signalstop:= received_str;
+            
+        ENDIF
+ENDPROC
+    
+PROC modechecker(num mode)
+         
+        IF checkpos = TRUE THEN
+            
+            IF selected = TRUE THEN
+                
+                 wohoo:=1; 
+                 
+            ENDIF
+          
+        ELSEIF checkjoint = TRUE THEN
+            
+            IF mode<=2 THEN
+                
+                IF selected = TRUE THEN
+                    
+                    wohoo:=1; 
+                    
+                ENDIF
+                
+            ELSE
+                
+                wohoo:=0;
+                
+            ENDIF
+        ELSEIF checkmode = TRUE THEN
+            
+            IF mode = 2 THEN
+                    
+                    wohoo:=1; 
+                    
+            ENDIF
+            
+        ENDIF
+        
+  IF checkinput = TRUE THEN
+            
+        IF mode<=2 THEN
+            
+                iO_yesno:=0;
+                
+        ELSEIF mode = 3 then
+                
+            IF selected = TRUE THEN
+                
+                    iO_yesno:=1;
+                    
+            ENDIF
+                
+         ENDIF
+         
+  ENDIF
+  
+    IF signalstop = "S1" THEN
+        
+        position_stop:= position;
+         
+        jointpos_stop:=jointpos;
+        
+        StopMove;
+        
+    ENDIF
+    IF signalstop = "S2" THEN
+        
+        StartMove;
+        
+        position:= position_stop;
+        
+        jointpos:=jointpos_stop;
+        
+        signalstop:="";
+        
+    ENDIF
+    
+ENDPROC
+
+    PROC pleasebitch(num wohoo)
+        
+        IF wohoo=1 THEN
+            
+            startTask1:=TRUE;
+            
+        ELSE
+            
+            startTask1:=FALSE;
+            
+        ENDIF
+
+    ENDPROC
+    
+        PROC IObitch()
+            
+        IF iO_yesno = 1 THEN
+            
+            start_IO:=TRUE;
+            
+        ELSE
+            
+            start_IO:=FALSE;
+            
+        ENDIF
+
+    ENDPROC
+    
+
+    PROC ListenForAndAcceptConnection()
+
+        ! Create the socket to listen for a connection on.
+        VAR socketdev welcome_socket;
+        SocketCreate welcome_socket;
+
+        ! Bind the socket to the host and port.
+        SocketBind welcome_socket,host,port;
+
+        ! Listen on the welcome socket.
+        SocketListen welcome_socket;
+
+        ! Accept a connection on the host and port.
+        SocketAccept welcome_socket,client_socket;
+
+        ! Close the welcome socket, as it is no longer needed.
+        SocketClose welcome_socket;
+
+    ENDPROC
+
+    ! Close the connection to the client.
+    PROC CloseConnection()
+        SocketClose client_socket;
+    ENDPROC
+
+    PROC starter_func()
+        
+        IF starter = TRUE  THEN
+            
+            position:=[200,0,147];
+            jointpos:=[0,0,0,0,0,0];
+            speed_value:=[300,500,5000,1000];
+            IO_signal :=[0,0,0,0,100,0];
+            starter:= FALSE;
+            selected := FALSE;
+            move_please:= FALSE;
+            checkpos:=FALSE;
+            checkjoint:=FALSE;
+            checkinput:=FALSE;
+            checkmode:=FALSE;
+        ENDIF
+        
+    ENDPROC
+    
+ENDMODULE
+            IF mode = 2 THEN
+                    
+                    wohoo:=1; 
+                    
+            ENDIF
+            
+        ENDIF
+        
+  IF checkinput = TRUE THEN
+            
+        IF mode<=2 THEN
+            
+                iO_yesno:=0;
+                
+        ELSEIF mode = 3 then
+                
+            IF selected = TRUE THEN
+                
+                    iO_yesno:=1;
+                    
+            ENDIF
+                
+         ENDIF
+         
+  ENDIF
+  
+    IF signalstop = "S1" THEN
+        
+        position_stop:= position;
+         
+        jointpos_stop:=jointpos;
+        
+        StopMove;
+        
+    ENDIF
+    IF signalstop = "S2" THEN
+        
+        StartMove;
+        
+        position:= position_stop;
+        
+        jointpos:=jointpos_stop;
+        
+        signalstop:="";
+        
+    ENDIF
+    
+ENDPROC
+
+    PROC pleasebitch(num wohoo)
+        
+        IF wohoo=1 THEN
+            
+            startTask1:=TRUE;
+            
+        ELSE
+            
+            startTask1:=FALSE;
+            
+        ENDIF
+
+    ENDPROC
+    
+        PROC IObitch()
+            
+        IF iO_yesno = 1 THEN
+            
+            start_IO:=TRUE;
+            
+        ELSE
+            
+            start_IO:=FALSE;
+            
+        ENDIF
+
+    ENDPROC
+    
+
+    PROC ListenForAndAcceptConnection()
+
+        ! Create the socket to listen for a connection on.
+        VAR socketdev welcome_socket;
+        SocketCreate welcome_socket;
+
+        ! Bind the socket to the host and port.
+        SocketBind welcome_socket,host,port;
+
+        ! Listen on the welcome socket.
+        SocketListen welcome_socket;
+
+        ! Accept a connection on the host and port.
+        SocketAccept welcome_socket,client_socket;
+
+        ! Close the welcome socket, as it is no longer needed.
+        SocketClose welcome_socket;
+
+    ENDPROC
+
+    ! Close the connection to the client.
+    PROC CloseConnection()
+        SocketClose client_socket;
+    ENDPROC
+
+    PROC starter_func()
+        
+        IF starter = TRUE  THEN
+            
+            position:=[200,0,147];
+            jointpos:=[0,0,0,0,0,0];
+            speed_value:=[300,500,5000,1000];
+            IO_signal :=[0,0,0,0,100,0];
+            starter:= FALSE;
+            selected := FALSE;
+            move_please:= FALSE;
+            checkpos:=FALSE;
+            checkjoint:=FALSE;
+            checkinput:=FALSE;
+            checkmode:=FALSE;
+        ENDIF
+        
+    ENDPROC
+    
+ENDMODULE
