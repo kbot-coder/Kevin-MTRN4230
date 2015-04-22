@@ -1,0 +1,25 @@
+These are the functioning codes on the demosntration day. In GUI_demo
+
+
+
+GUI_Design_2015_04_8.m & GUI_Design_2015_04_8.fig 	
+	: the main GUI
+
+
+CheckList_GUI.m & CheckList_GUI.fig 	
+	: The safety checklist need to be run initially. (run the .m file first)
+
+
+sender.m 	
+	: send the command to ABB robot. 
+
+
+Take_Rob_Status.m 	
+	: get the status of the ABB robot and IOs.
+
+
+plotBoxConv.m 	
+	: detect the boxes on the conveyor.
+
+
+

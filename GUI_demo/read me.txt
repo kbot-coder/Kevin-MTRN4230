@@ -1,0 +1,1 @@
+if the time exeed, please reduce the sample size to 20 from store samplename function
