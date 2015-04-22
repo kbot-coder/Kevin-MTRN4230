@@ -32,9 +32,7 @@ function GUI_Design_2015_04_8_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Set All Handles Variable
 handles.ConveyorEnable = 1;
-
 handles.output = hObject;
-
 set(handles.axes3,'Visible','Off');
 
 %---------------------------------------------------
@@ -45,8 +43,11 @@ set(handles.axes3,'Visible','Off');
 % set(findall(handles.JointPositionInput, '-property', 'enable'), 'enable', 'off');
 % set(findall(handles.EndEffectorGoal, '-property', 'enable'), 'enable', 'off');
 
-handles.vid1  = webcam('FaceTime HD Camera');
-handles.vid2  = webcam('Logitech Camera');
+% handles.vid1  = webcam('FaceTime HD Camera');
+% handles.vid2  = webcam('Logitech Camera');
+
+handles.vid1  = videoinput('macvideo',1);
+handles.vid2  = videoinput('macvideo',2);
 
 handles.timer= timer(...
     'ExecutionMode', 'fixedRate', ...       % Run timer repeatedly
@@ -817,15 +818,15 @@ function ShowIm_Callback(hObject, eventdata, handles)
 % hObject    handle to ShowIm (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% handles.vid1 .FramesPerTrigger = 1;
-% handles.vid1 .ReturnedColorspace = 'rgb';
-% triggerconfig(handles.vid1 , 'manual');
-% vidRes = get(handles.vid1 , 'VideoResolution');
-% imWidth = vidRes(1);
-% imHeight = vidRes(2);
-% nBands = get(handles.vid1 , 'NumberOfBands');
+handles.vid1 .FramesPerTrigger = 1;
+handles.vid1 .ReturnedColorspace = 'rgb';
+triggerconfig(handles.vid1 , 'manual');
+vidRes = get(handles.vid1 , 'VideoResolution');
+imWidth = vidRes(1);
+imHeight = vidRes(2);
+nBands = get(handles.vid1 , 'NumberOfBands');
 axes(handles.ConvCam);
-hImage = image(zeros(768,1024, 3), 'parent', handles.ConvCam);
+hImage = image(zeros(imHeight,imWidth, nBands), 'parent', handles.ConvCam);
 preview(handles.vid1,hImage);
 
 % --- Executes on button press in StopIm.
@@ -835,18 +836,18 @@ function StopIm_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 % set ( handles.CmdStatus, 'String' , 'Stop Showing Video From Camera Input' ) ;
 % stoppreview(handles.vid2);
-% handles.vid2 .FramesPerTrigger = 1;
-% handles.vid2 .ReturnedColorspace = 'rgb';
-% triggerconfig(handles.vid2 , 'manual');
-% vidRes = get(handles.vid2 , 'VideoResolution');
-% imWidth = vidRes(1);
-% imHeight = vidRes(2);
-% nBands = get(handles.vid2 , 'NumberOfBands');
-% axes(handles.TableCam);
-% hImage2 = image(zeros(720, 1280, 3), 'parent', handles.TableCam);
-% preview(handles.vid2,hImage2);
-closePreview(handles.vid1);
-clear('handles.vid1');
+handles.vid2 .FramesPerTrigger = 1;
+handles.vid2 .ReturnedColorspace = 'rgb';
+triggerconfig(handles.vid2 , 'manual');
+vidRes = get(handles.vid2 , 'VideoResolution');
+imWidth = vidRes(1);
+imHeight = vidRes(2);
+nBands = get(handles.vid2 , 'NumberOfBands');
+axes(handles.TableCam);
+hImage2 = image(zeros(imHeight, imWidth, nBands), 'parent', handles.TableCam);
+preview(handles.vid2,hImage2);
+%closePreview(handles.vid1);
+%clear('handles.vid1');
 
 % --- Executes when user attempts to close figure1.
 function figure1_CloseRequestFcn(hObject, eventdata, handles)

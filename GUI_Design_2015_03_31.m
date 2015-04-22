@@ -1,30 +1,4 @@
 function varargout = GUI_Design_2015_03_31(varargin)
-% GUI_DESIGN_2015_03_31 MATLAB code for GUI_Design_2015_03_31.fig
-%      GUI_DESIGN_2015_03_31, by itself, creates a new GUI_DESIGN_2015_03_31 or raises the existing
-%      singleton*.
-%
-%      H = GUI_DESIGN_2015_03_31 returns the handle to a new GUI_DESIGN_2015_03_31 or the handle to
-%      the existing singleton*.
-%
-%      GUI_DESIGN_2015_03_31('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in GUI_DESIGN_2015_03_31.M with the given input arguments.
-%
-%      GUI_DESIGN_2015_03_31('Property','Value',...) creates a new GUI_DESIGN_2015_03_31 or raises the
-%      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before GUI_Design_2015_03_31_OpeningFcn gets called.  An
-%      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to GUI_Design_2015_03_31_OpeningFcn via varargin.
-%
-%      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
-%      instance to run (singleton)".
-%
-% See also: GUIDE, GUIDATA, GUIHANDLES
-
-% Edit the above text to modify the response to help GUI_Design_2015_03_31
-
-% Last Modified by GUIDE v2.5 31-Mar-2015 17:19:33
-
-% Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
