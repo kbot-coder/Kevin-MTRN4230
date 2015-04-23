@@ -1,0 +1,65 @@
+MODULE Task_1
+    !initial variable passed from task2
+    PERS  pos position:= [500,0,150];
+    PERS  robjoint jointpos:= [-150,0,0,0,0,0];
+    PERS bool startTask1 := FALSE;
+    PERS num mode := 2;
+    PERS speeddata speed_value;
+    PERS bool move_please;
+
+    ! The Main procedure. When you select 'PP to Main' on the FlexPendant, it will go to this procedure.
+    PROC MainMove()
+       
+        VAR robjoint jointsJ ;
+        VAR pos targetL;
+        VAR pos targetL_J;
+        
+        !prevent task1 to run without task2 permission
+        WaitUntil startTask1;
+        jointsJ:=jointpos;
+        targetL:= position;
+         
+	!run task1 according to mode selected  
+        weAllLoveMTRN mode, targetL_J, targetL, jointsJ ;    
+    	
+	!disable task1
+        startTask1:=FALSE;
+        
+    ENDPROC
+    
+    PROC weAllLoveMTRN(num iWantThis, pos targetL_J, pos targetL,robjoint jointsJ)
+	!run task1 according to mode selected
+        VAR intnum pause:= 0;
+        targetL_J.x := targetL.x;
+        targetL_J.y := targetL.y;
+        targetL_J.z := targetL.z;
+        
+          
+         IF iWantThis = 0 THEN
+                !move linearly to target position
+                
+                !MoveJ ([targetL_J,[0,0,1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]]), speed_value,fine,tSCup;
+                
+                MoveL ([targetL,[0,0,1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]]), speed_value, fine, tSCup;
+            
+            ELSEIF iWantThis = 1  THEN
+                !move joint by joint to target position
+                
+                MoveAbsJ [jointsJ,[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]], speed_value, fine, tSCup;
+                
+            ELSEIF iWantThis =2 THEN
+                
+		!move to calibration position
+                MoveToCalibPos;
+                
+            ELSEIF iWantThis = 4 THEN
+		!move by joint to target position
+                MoveJ ([targetL_J,[0,0,1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]]), speed_value,fine,tSCup;
+                
+            ENDIF
+            
+    ENDPROC
+          
+   
+    
+ENDMODULE
