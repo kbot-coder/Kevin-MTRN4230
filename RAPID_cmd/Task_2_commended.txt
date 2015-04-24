@@ -1,0 +1,285 @@
+MODULE TASK2
+   
+
+    ! The socket connected to the client.
+    VAR socketdev client_socket;
+    
+    ! initialize input to be false
+    ! to prevent faulty input
+    !*************************************
+    VAR bool checkpos:=FALSE;
+    VAR bool checkjoint:=FALSE;
+    VAR bool checkinput:=FALSE;
+    VAR bool checkmode:=FALSE;
+    VAR bool checkJpos:=FALSE;
+    ! ************************************
+    VAR num size; !check size of the string
+    VAR string received_str;	!check string
+    
+    ! Current robot status value
+    ! ***********************************************
+    PERS pos position:=[500,0,150];
+    PERS robjoint jointpos:=[-150,0,0,0,0,0];
+    PERS speeddata speed_value:=[300,500,5000,1000];
+    PERS robjoint IO_signal :=[-150,0,0,0,0,0];
+    ! ***********************************************
+	
+    !store value when stop function is called;
+    !************************************************
+    PERS pos position_stop; ! store the previous position
+    PERS robjoint jointpos_stop; ! store the previous position
+    !************************************************
+
+    PERS bool selected; !check if input is valid or not
+    PERS num mode:=2;  !moving mode
+    PERS num task1Trig:=1; !to start task 1
+    PERS num iO_yesno:=0; !to start IO
+    
+    ! To prevent Task1, Task2 and Task3 from running
+    !*******************************************************
+    PERS bool move_please := FALSE;
+    PERS bool startTask1:=FALSE;
+    PERS bool start_IO:=FALSE;
+    !*******************************************************
+    
+    VAR bool starter:= TRUE;    ! the initialiser
+    PERS string signalstop:=""; ! to initialise stop value
+   
+    ! The host and port that we will be listening for a connection on.
+    CONST string host:="127.0.0.1";
+    CONST num port:=1025;
+
+
+    PROC MainServer()
+        
+        !prevent &reset when input already been received
+        checkpos:=FALSE;
+        checkjoint:=FALSE;
+        checkinput:=FALSE;
+        checkmode:=FALSE;
+        checkJpos:=FALSE;
+        
+        !when the program start, initialize the value to a harmless value
+        starter_func;
+     	
+	!open and accept connection
+        ListenForAndAcceptConnection;
+
+        !Receive a string from the client.
+        SocketReceive client_socket\Str:=received_str;
+
+        !convert input to value       
+        ConvStrtoVal received_str;
+        
+	!check input for which mode are desired
+        modechecker mode;
+         
+	!run task 1 if needed 
+        task1Runner task1Trig;
+        
+        !run IO if needed 
+        IObitch; 
+
+        !close connection
+        CloseConnection;
+
+    ENDPROC
+
+PROC ConvStrToVal(string received_str)
+	!mode value are value with 1 string  size
+	!mode list : 0 - linear move 
+	!	     1 - joint move
+        !            2 - move to calib pos
+        !            3 - set IO on/off and speed
+        !            S1- stop
+	!            S2- resume
+        size:=StrLen(received_str);
+        
+        IF size=1 THEN
+            
+            !if mode is selected prevent task1 to run
+            checkmode:=StrtoVal(received_str,mode);
+            task1Trig :=0;
+            selected := FALSE;
+            
+        else
+            
+	    !store value to variable and run task1
+            checkpos:=StrtoVal(received_str,position);
+            checkJpos:=StrtoVal(received_str,position);
+            checkjoint:= StrToVal(received_str,jointpos);
+            checkinput:=StrToVal(received_str,IO_signal);
+            selected:=TRUE;
+            
+        ENDIF
+        
+        IF size = 2 THEN
+            !detect stop signal
+            signalstop:= received_str;
+            
+        ENDIF
+ENDPROC
+    
+PROC modechecker(num mode)
+        !check input given for which mode it is
+        IF checkpos = TRUE THEN
+            
+            IF selected = TRUE THEN
+                
+                 task1Trig:=1; 
+                 
+            ENDIF
+          
+        ELSEIF checkjoint = TRUE THEN
+            
+            IF mode<=2 THEN
+                
+                IF selected = TRUE THEN
+                    !if the mode is movement mode
+                    task1Trig:=1; 
+                    
+                ENDIF
+                
+            ELSE
+
+                !if the mode is not movement mode
+                task1Trig:=0;
+                
+            ENDIF
+        ELSEIF checkmode = TRUE THEN
+            
+            IF mode = 2 THEN
+                    
+                    task1Trig:=1; 
+                    
+            ENDIF
+            
+        ENDIF
+        IF checkJpos = TRUE THEN
+            
+            IF mode= 4 THEN
+                
+                    task1Trig:=1;
+                
+            ENDIF
+        ENDIF
+        
+  IF checkinput = TRUE THEN
+            
+        IF mode<=2 THEN
+            	!if mode is not IO
+                iO_yesno:=0;
+                
+        ELSEIF mode = 3 then
+                
+            IF selected = TRUE THEN
+               	    !if mode is  IO
+                    iO_yesno:=1;
+                    
+            ENDIF
+                
+         ENDIF
+         
+  ENDIF
+    !below is for detecting stop function
+    !by storing the value in temporary variable
+    IF signalstop = "S1" THEN
+        !storing value
+        position_stop:= position;
+         
+        jointpos_stop:=jointpos;
+        
+        StopMove;
+        
+    ENDIF
+    IF signalstop = "S2" THEN
+        
+        StartMove;
+        !restoring value
+        position:= position_stop;
+        
+        jointpos:=jointpos_stop;
+        
+        signalstop:="";
+        
+    ENDIF
+    
+ENDPROC
+    !run task 1
+    PROC task1Runner(num task1Trig)
+
+        !start task 1   
+        IF task1Trig=1 THEN
+            
+            startTask1:=TRUE;
+            
+        ELSE
+            
+            startTask1:=FALSE;
+            
+        ENDIF
+
+    ENDPROC
+    	
+        PROC IObitch()
+
+        !start IO    
+        IF iO_yesno = 1 THEN
+            
+            start_IO:=TRUE;
+            
+        ELSE
+            
+            start_IO:=FALSE;
+            
+        ENDIF
+
+    ENDPROC
+    
+
+    PROC ListenForAndAcceptConnection()
+	!open conncetion
+        ! Create the socket to listen for a connection on.
+        VAR socketdev welcome_socket;
+        SocketCreate welcome_socket;
+
+        ! Bind the socket to the host and port.
+        SocketBind welcome_socket,host,port;
+
+        ! Listen on the welcome socket.
+        SocketListen welcome_socket;
+
+        ! Accept a connection on the host and port.
+        SocketAccept welcome_socket,client_socket;
+
+        ! Close the welcome socket, as it is no longer needed.
+        SocketClose welcome_socket;
+
+    ENDPROC
+
+    ! Close the connection to the client.
+    PROC CloseConnection()
+        SocketClose client_socket;
+    ENDPROC
+
+    PROC starter_func()
+        
+        IF starter = TRUE  THEN
+            !starting value
+            !to prevent error
+            position:=[200,0,147];
+            jointpos:=[0,0,0,0,0,0];
+            speed_value:=[300,500,5000,1000];
+            IO_signal :=[0,0,0,0,100,0];
+            starter:= FALSE;
+            selected := FALSE;
+            move_please:= FALSE;
+            checkpos:=FALSE;
+            checkjoint:=FALSE;
+            checkinput:=FALSE;
+            checkmode:=FALSE;
+        ENDIF
+        
+    ENDPROC
+    
+ENDMODULE
