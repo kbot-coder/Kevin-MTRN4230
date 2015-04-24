@@ -26,7 +26,6 @@ end
 % Send a sample string to the server on the robot.
 % for i=1:30
 
- 
     
 % POS = [A,B,C,D,E,F];
 % robjoint = int2str(POS);
