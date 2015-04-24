@@ -615,7 +615,7 @@ function ImCapt_Callback(hObject, eventdata, handles)
 
 % Capture table camera, process it, detect choclate, & show it in axes 3
 imgTable=getsnapshot(handles.vid1);     % capture image from video 1 (Table camera)
-c=detect(imTable);                      % call function detect to process the image to detect chocolate
+c=detect_chocolates(imTable);           % call function detect_chocolates to process the image to detect chocolate
 set(handles.axes3);                     % set axes 3 for showing detected chocolate
 handle.c =c;                            % data chocolate
 set(handles.ChocTable,'Data',handle.c); % show data chocolate on the table 
