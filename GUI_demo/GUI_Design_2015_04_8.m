@@ -1013,13 +1013,12 @@ function ImCapt_Callback(hObject, eventdata, handles)
  imgConv=getsnapshot(handles.vid2);% 1.Get snap shot
 % im=imread('IMG_003.jpg');
 % % % % % im = imgTable;
-% % % % % 
 % % % % % c=detect(im);
 % % % % % set(handles.axes3); 
-% % % % % 
 % % % % % handle.c =c;
 % % % % % set(handle.ChocTable,'userdata',handle.c) ;
 % % % % % hold on;
+
 plotBoxConv(imgConv);
 set(handles.axes3);
 
