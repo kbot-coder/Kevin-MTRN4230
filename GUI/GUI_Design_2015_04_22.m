@@ -37,6 +37,8 @@ handles.position    = [ 0,0,0];
 handles.joint       = [ 0,0,0,0,0,0];
 handles.Speed ='10';
 handles.pause=0;
+handles.chocolates = [];
+handles.box = [];
 
 % Initial Input Output - Conveyor Run ; Conveyor Direction ; Solenoid Valve
 % ; Vacuum Pump
@@ -622,8 +624,14 @@ set(handles.ChocTable,'Data',handle.c); % show data chocolate on the table
 
 % Capture conveyor camera, process it, detect the box & show it in axes 4
 imgConv=getsnapshot(handles.vid2);      % capture image from video 2 (conveyor camera)
-plotBoxConv(imgConv);                   % call function plotBoxConv to detect box
+handles.box = plotBoxConv(imgConv);                   % call function plotBoxConv to detect box
 set(handles.axes4);                     % set axes34 to show detected box
+
+imgTble = getsnapshot(handles.vid1);      % ----------------------
+handles.chocolates = findChoc(imgTble);   % HERE THE CHOC DETECTION
+set(handles.axes3);                       % --------------------
+    
+guidata(hObject, handles);
 
 %--------------------------Click & GO Button-------------------------------
 

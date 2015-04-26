@@ -1,8 +1,9 @@
 %%PLOTTING THE CENTER AND THE Rectangle OF THE BOX
 %% inputs_      im : the image snapshot from the conveyor
 %% outputs_     
-function plotBoxConv(im)
-    
+function c = plotBoxConv(im)
+    c = [];
+    theta = 0;
     I2 = im;
     % masking the image so that the boxes can be clearly detected
     I2 = convMask(im); 
@@ -27,15 +28,20 @@ function plotBoxConv(im)
         if i>length(s)
             break;
         end
-        cT = cos(s(i).Orientation/180*pi);
-        sT = sin(s(i).Orientation/180*pi);   
+        X = s(i).Centroid(1);
+        Y = s(i).Centroid(2);
+        theta = s(i).Orientation/180*pi;
+        cT = cos(theta);
+        sT = sin(theta);   
         xs = [70, 70, -70, -70, 70];
         ys = [38, -38, -38, 38, 38];
         rec = [cT , sT; -sT, cT]*[xs;ys]+...
             [s(i).Centroid' s(i).Centroid' s(i).Centroid' s(i).Centroid' s(i).Centroid'];
-        plot(s(i).Centroid(1),s(i).Centroid(2),'ro');
+        plot( X, Y,'ro');
         plot(rec(1,:),rec(2,:),'g');
+        c(i) = [ X, Y, theta];
     end
+return
 end
 
 
