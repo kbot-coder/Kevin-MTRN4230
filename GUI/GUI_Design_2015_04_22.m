@@ -78,7 +78,12 @@ set(handles.TableCam,'xtick',[],'ytick',[]);    % Supress the TableCam axis valu
 % Just for showing logo(robot picture in axes5)
 axes(handles.axes5);
 imshow(imread('preview.jpg'));
-
+axes(handles.axes4);
+imshow(imread('converyor.jpg'));
+axes(handles.axes3);
+imshow(imrot90(imread('empty.png'),2));
+set(handles.ConvCam,'Visible','off');
+set(handles.TableCam,'Visible','off');
 %Managing Video handles
 % handles.vid1  = videoinput('macvideo',1);
 % handles.vid2  = videoinput('macvideo',2);
