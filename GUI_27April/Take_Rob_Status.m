@@ -1,12 +1,41 @@
 function [pos, joint, IO] = Take_Rob_Status()
-errs= 0;    % intialise the error value
+
 socket = tcpip('127.0.0.1',1026);   % define the socket
 set(socket, 'ReadAsyncMode', 'continuous');     % set the socket
+socket.Timeout = 5;     % set the socket
 
-while errs == 0 ;
-    try
-        fopen(socket);
+
+% % % % % robot_IP_address = '127.0.0.1';
+% % % % % robot_port = 1025;
+% % % % % socket2 = tcpip(robot_IP_address, robot_port);
+% % % % % set(socket2, 'ReadAsyncMode', 'continuous');
+
+
+while 1
+% % % % %         try
+% % % % %             fopen(socket2);
+% % % % %             fwrite(socket2, '0');
+% % % % %             fclose(socket2);
+% % % % %         catch err
+% % % % %             uiwait(errordlg(err.message,'Connection Error 1'));
+% % % % %             continue;
+% % % % %         end    
+       
+    
+        try
+            fopen(socket);
+        catch err
+            uiwait(errordlg(err.message,'Connection Error'));
+            continue;
+        end
+
         data = fgetl(socket);   % get the data from RAPID
+        
+    if isempty(data)    
+        uiwait(errordlg(lastwarn,'Connection Error -  No Data Received'));
+        fclose(socket);
+        continue;
+    else
 
         openBracket = find(data == '[');    % find open bracket in the data
         closeBracket = find(data == ']');   % find close bracket in the data
@@ -22,22 +51,8 @@ while errs == 0 ;
         IO = str2num(IOStr);
 
         fclose(socket);
-        errs = 0;
-
-    % a warning windows if there is any error
-    catch err
-        disp('ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ERROR ');  
-        uiwait(errordlg('LOST CONNECTION. Please repair the source of error ','Connection Error'));
-        try 
-            fopen(socket);
-            fclose(socket);
-        catch err
-            fclose(socket);
-        end
-        disp('RESTARTED');%
-        errs = 1;
+        break;
     end
+
 end
-
-
 
