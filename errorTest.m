@@ -13,13 +13,15 @@ clc;
 %% u : the socket
 u   = udp('173.194.116.191', 65535);
 
-% u   = udp('asdasdfafg123346tfhwt.com', 65535);
+% u   = udp('asdasdfafg123346tfhwt.com', 65500);
 
 
-u.Timeout = 0.01;   % Set the timeout
+u.Timeout = 10;   % Set the timeout
 
 data = 0;
 while 1
+    
+    
     
     
     % Check if the connection exist
@@ -32,17 +34,17 @@ while 1
 
     data = fread(u);  
 
-    fwrite(u,1212312312312331);
+%     fwrite(u,1212312312312331);
 
 
     fclose(u);
-    if isempty(data)
-        uiwait(errordlg(lastwarn,'Connection Error'));
-        disp(data);
-        continue
-    else
-        break;
-    end
+%     if isempty(data)
+%         uiwait(errordlg(lastwarn,'Connection Error'));
+%         disp(data);
+%         continue
+%     else
+%         break;
+%     end
 end
 
 % % % if ispc
