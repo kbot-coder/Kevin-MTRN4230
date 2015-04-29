@@ -22,7 +22,7 @@ function varargout = GUIchocDetect(varargin)
 
 % Edit the above text to modify the response to help GUIchocDetect
 
-% Last Modified by GUIDE v2.5 29-Apr-2015 20:33:58
+% Last Modified by GUIDE v2.5 30-Apr-2015 02:10:49
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -54,6 +54,20 @@ function GUIchocDetect_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Choose default command line output for GUIchocDetect
 handles.output = hObject;
+handles.chocStat = [];
+handles.chocRec = [];
+handles.chocPicked = 0;
+handles.chocString = {};
+
+
+
+% Show what need to need to be done before start
+axes(handles.axesVid);
+chocImage = imread('Training set/IMG_005.jpg');
+imshow(chocImage);
+
+set(handles.edit1,'string', 'YES MASTER,  what should I do? ' );
+
 
 % Update handles structure
 guidata(hObject, handles);
@@ -75,15 +89,29 @@ varargout{1} = handles.output;
 
 % --- Executes on button press in pushbutton1.
 function pushbutton1_Callback(hObject, eventdata, handles)
+
     set(handles.edit1,'string', 'detection in progress');
-    set(handles.axes1);
-    chocImage = imread('all.png');
-%     chocImage = imread('Training set/all.jpg');
-    imshow(chocImage);
-    [c] = findChoc(chocImage);
+    chocImage = imread('Training set/IMG_005.jpg');
+    % Show Video Preview
     
-    set(handles.uitable1, 'data', c);
+%     chocImage = imread('all.png');
+    
+
+    % Plot the Detected Perimeters
+    axes(handles.axesDetect);
+    handles.chocStat    = [];
+    [handles.chocStat ,handles.chocRec ]  = findChoc(chocImage);
+    set(handles.axesDetect,'color','none','Xlim',[0 1600],'ylim',[0 900]...
+        ,'Xtick',[], 'Ytick',[]);
+    
+    
     set(handles.edit1,'string', 'done detection');
+    
+    handles.chocString = data2str(handles.chocStat,0,0);
+    set(handles.uitable1, 'data', handles.chocString );
+    
+    
+    guidata(hObject, handles);
 
 
 
@@ -107,3 +135,73 @@ function edit1_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes when selected cell(s) is changed in uitable1.
+function uitable1_CellSelectionCallback(hObject, eventdata, handles)
+try
+    chocN = eventdata.Indices(1);
+    set(handles.edit1,'string', ['Master picked chocolate ' num2str(chocN)] );
+    handles.chocPicked = chocN;
+
+    set(handles.uitable1, 'data', handles.chocString);
+
+    tempStr = data2str(handles.chocString,chocN,'string');
+
+    %# set table data
+    set(handles.uitable1, 'data', tempStr);
+
+
+
+    %plotting the rectangle 
+    axes(handles.axesSelect);
+    plot(handles.chocRec{chocN}(1,:), handles.chocRec{chocN}(2,:), '--k'); 
+    set(handles.axesSelect,'color','none','Xlim',[0 1600],'ylim',[0 900]...
+          ,'Xtick',[], 'Ytick',[]);
+catch
+end
+ guidata(hObject, handles);
+
+
+% --- Executes on button press in ChooseChocBtn.
+function ChooseChocBtn_Callback(hObject, eventdata, handles)
+set(handles.edit1,'string', 'Press ENTER to cancel' );
+[X, Y]=ginput(1); 
+set(handles.edit1,'string', ['X : ' num2str(X) ...
+    '     Y : ' num2str(Y) ] );
+inside = 0;
+for choco = 1:60
+    try
+        inside = inpolygon( X,Y,...
+            handles.chocRec{choco}(1,:), handles.chocRec{choco}(2,:));
+        if inside ~= 0
+            set(handles.edit1,'string',...
+                ['Yea Baby! it is inside '   num2str(choco) ] );
+            chocN = choco;
+            handles.chocPicked = chocN;
+
+            set(handles.uitable1, 'data', handles.chocString);
+
+            tempStr = data2str(handles.chocString,chocN,'string');
+
+            %# set table data
+            set(handles.uitable1, 'data', tempStr);
+
+            %plotting the rectangle 
+            axes(handles.axesSelect);
+            plot(handles.chocRec{chocN}(1,:), ...
+               handles.chocRec{chocN}(2,:), '--k'); 
+            set(handles.axesSelect,'color','none','Xlim'...
+                ,[0 1600],'ylim',[0 900]...
+                  ,'Xtick',[], 'Ytick',[]);
+                
+            guidata(hObject, handles);
+            return;
+        end
+    catch
+    end      
+end
+set(handles.edit1,'string', 'It is not in.. Yet '  );
+set(handles.uitable1, 'data', handles.chocString);
+guidata(hObject, handles);
+
