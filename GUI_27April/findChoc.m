@@ -1,5 +1,6 @@
 function c = findChoc(chocImage)
     hold on;
+    %%%%%%%%%%%%%%%
     c   = [];
     found   = 0;
     % Load all files containing the variables
