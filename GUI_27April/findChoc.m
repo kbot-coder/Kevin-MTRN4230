@@ -1,5 +1,5 @@
 function c = findChoc(chocImage)
-    hold on;
+    hold off; hold on;
     %%%%%%%%%%%%%%%
     c   = [];
     found   = 0;
@@ -58,9 +58,10 @@ function c = findChoc(chocImage)
                         cosT    = cos(theta);
                         sinT    = sin(theta);
                         rec = [cosT, -sinT; sinT, cosT]*[ 92, 92, -92,...
-                            -92, +92 ; 44, -44, -44, 44, 44]...
+                            -92, +92 ; 43, -43, -43, 43, 43]...
                             +[X X X X X; Y Y Y Y Y]; 
-                        plot(rec(1,:),1200-rec(2,:),'g');
+%                         plot(rec(1,:),1200-rec(2,:),'g');
+                        plot( rec(1,:), rec(2,:), 'g');
                         xq  = img.SURFp.Location(:,1);
                         yq  = img.SURFp.Location(:,2);
                         xv  = rec(1,:)';
@@ -69,7 +70,29 @@ function c = findChoc(chocImage)
                         img.SURFf(in, :)=[];
                         img.SURFp(in)=[];                   
                         detect = 1;
-                        hold on; plot(X,1200-Y,'ro'); hold on;
+ 
+                       switch flavi
+                           case 1
+                               Realflavi=4;
+                               plot( X, Y, 'go'); 
+                           case 2
+                               Realflavi=3;
+                               plot( X, Y, 'ko'); 
+                           case 3
+                               Realflavi=2;
+                               plot( X, Y, 'ro'); 
+                           case 4
+                               Realflavi=1;
+                               plot( X, Y, 'bo'); 
+                           otherwise
+                               Realflavi=0;
+                               plot( X, Y, 'r*'); 
+                       end
+                       
+%                         plot(X,1200-Y,'ro');                       
+
+
+                        
                         % checking pickability == reachability
                         if (((X-800)^2)/(800^2) + ((Y-143)^2)/(570^2)) <=1
                             reach = 1;
@@ -91,26 +114,13 @@ function c = findChoc(chocImage)
                             topBtm = 1;
                         end
 
-                       switch flavi
-                           case 1
-                               Realflavi=4;
-                           case 2
-                               Realflavi=3;
-                           case 3
-                               Realflavi=2;
-                           case 4
-                               Realflavi=1;
-                           otherwise
-                               Realflavi=0;
-                       end
-                        c(found,:)  = [X, Y, theta,...
+
+                        c(found,:)  = [round(X), round(Y), theta,...
                             177, 81, Realflavi, topBtm, reach, pick ];
-                        
-                    end                                
+                        disp([num2str(found) ' : ' num2str(scaleRecovered) ]);
+                    end                                 
                 end            
             end
         end
     end
-    hold off;
-    disp('END');
  return 
