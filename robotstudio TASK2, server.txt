@@ -1,71 +1,294 @@
-MODULE TASK2   
-	
+MODULE TASK2
+   
+
     ! The socket connected to the client.
     VAR socketdev client_socket;
-    VAR bool checkpos;
-    VAR bool checkjoint;
-    PERS  pos position;
-    PERS  robjoint jointpos;
+    
+    ! initialize input to be false
+    !*************************************
+    VAR bool checkpos:=FALSE;
+    VAR bool checkjoint:=FALSE;
+    VAR bool checkinput:=FALSE;
+    VAR bool checkmode:=FALSE;
+    VAR bool checkJpos:=FALSE;
+    VAR bool checkBind:= FALSE;
+    ! ************************************
     VAR num size;
+    VAR string received_str;
+    PERS robtarget target :=[[175,0,147],[0,0,-1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    ! Current robot status value
+    ! ***********************************************
+    VAR pos position:=[175,520,147]; !position of the robot
+    VAR robjoint jointpos:=[0,0,0,0,500,0]; ! for the rotation of the end effector 
+    PERS speeddata speed_value:=[300,500,5000,1000];
+    PERS robjoint IO_signal :=[0,0,0,0,100,0];
+    PERS string signalBind:="";
+    ! ***********************************************
     
+    PERS pos position_stop; ! store the previous position
+    PERS robjoint jointpos_stop; ! store the previous position
+    PERS bool selected; !check if input is valid or not
+    PERS num mode:=0;
+    PERS num task1Trig:=1; !to start task 1
+    PERS num iO_yesno:=0; !to start IO
+    PERS num task3Trig:=0; !to start task 3
+    
+    ! To prevent Task1, Task2 and Task3 from running
+    PERS bool move_please := FALSE;
+    PERS bool startTask1:=FALSE;
+    PERS bool start_IO:=FALSE;
+    
+    VAR bool starter:= TRUE;    ! the initialiser
+    PERS string signalstop:="''"; ! to initialise stop value
+   
     ! The host and port that we will be listening for a connection on.
-    CONST string host := "127.0.0.1";
-    CONST num port := 1025;
-    
-    
+    CONST string host:="127.0.0.1";
+    CONST num port:=1025;
+    CONST num port1:=1027;
+    CONST string start := "START";
+
+
     PROC MainServer()
         
-        VAR string received_str;
-       
+        checkpos:=FALSE;
+        checkjoint:=FALSE;
+        checkinput:=FALSE;
+        checkmode:=FALSE;
+        signalBind:="";
         
-        ListenForAndAcceptConnection;
-            
-        ! Receive a string from the client.
-        SocketReceive client_socket \Str:=received_str;
-            
-        ! Send the string back to the client, adding a line feed character.
-        SocketSend client_socket \Str:=received_str ;
-        
-        TPWrite (received_str);
-       ! size := StrLen(received_str);
-        
-            ! store value if it is x,y,z position
-           checkpos := StrtoVal(received_str,position);
-            ! store value if joint position.
-           checkjoint := StrtoVal(received_str,jointpos);
+        starter_func;
      
-        
-        
-       
-      !  TPWrite (ValToStr(position));
-      TPWrite (ValToStr(jointpos));
+        ListenForAndAcceptConnection;
+
+        !Receive a string from the client.
+        SocketReceive client_socket\Str:=received_str \Time:=30;
         CloseConnection;
-		
+        ! Send the string back to the client, adding a line feed character.        
+        TPWrite received_str;
+       
+        ConvStrtoVal received_str; !convert string to value function
+        
+        modechecker mode; !check mode function
+        getPosition position,jointpos; ! store position and jointpos as target.
+        task1Runner task1Trig; ! use o trigger moving task
+        
+        IOtask; !triger IO 
+
+        
+        CloseConnection;
+
     ENDPROC
 
-    PROC ListenForAndAcceptConnection()
+PROC ConvStrToVal(string received_str)
+        size:=StrLen(received_str); 
         
+        IF size=1 THEN
+            !if the signal receive have size =1 store it as mode
+            checkmode:=StrtoVal(received_str,mode);
+            task1Trig :=0;
+            selected := FALSE;
+            
+        ELSEIF size = 4 THEN
+        
+        signalBind:= received_str;
+        
+        ELSEIF size = 5 THEN
+            IF received_str = start THEN               
+            task1Trig :=1;  ! if size = 5 check if receives_str = start ie string "START" triger task1
+            ENDIF
+        ELSE
+            ! the received_str will be store in one of 3 varible
+            ! can be position [x,y,z] for position.
+            ! [0,0,0,0,0,xxx] for endeffector rotation
+            ! [0,1,0,1,100,0] for IO and speed. 1st four is IO, fifth is speed value
+            checkpos:=StrtoVal(received_str,position);            
+            checkjoint:= StrToVal(received_str,jointpos);
+            checkinput:=StrToVal(received_str,IO_signal);
+            selected:=TRUE;
+            
+        ENDIF
+      
+        
+       
+ENDPROC
+    
+PROC modechecker(num mode)
+         
+        IF checkpos = TRUE THEN
+            IF mode = 1 THEN 
+                IF selected = TRUE THEN
+                
+                     task1Trig:=1; 
+                 
+                ENDIF
+             ELSE
+                
+                task1Trig:=0;
+            ENDIF
+        
+          
+        ELSEIF checkjoint = TRUE THEN
+            
+            IF mode<=2 THEN
+                
+                IF selected = TRUE THEN
+                    
+                    task1Trig:=1; 
+                    
+                ENDIF
+                
+            ELSE
+                
+                task1Trig:=0;
+                
+            ENDIF
+            
+        ELSEIF checkmode = TRUE THEN
+            
+            IF mode = 2 THEN
+                    
+                    task1Trig:=1; 
+                    
+            ENDIF
+            
+        ENDIF
+        
+        
+  IF checkinput = TRUE THEN
+            
+        IF mode<=2 THEN
+            
+                iO_yesno:=0;
+                
+        ELSEIF mode = 3 then
+                
+            IF selected = TRUE THEN
+                
+                    iO_yesno:=1;
+                    
+            ENDIF
+                
+         ENDIF
+         
+  ENDIF
+  
+    
+    
+    IF signalBind = "KNOK" THEN
+            
+           reply;
+           TPWrite("YEAH");
+           
+           CloseConnection;
+        
+    ENDIF
+
+    
+ENDPROC
+
+
+
+    PROC task1Runner(num task1Trig)
+        
+        IF task1Trig=1 THEN
+            
+            startTask1:=TRUE;
+            
+        ELSE
+            
+            startTask1:=FALSE;
+            
+        ENDIF
+
+    ENDPROC
+    
+        PROC IOtask()
+            
+        IF iO_yesno = 1 THEN
+            
+            start_IO:=TRUE;
+            
+        ELSE
+            
+            start_IO:=FALSE;
+            
+        ENDIF
+
+    ENDPROC
+    
+    PROC getPosition(pos position, robjoint jointpos)
+        IF checkpos = TRUE THEN
+            target.trans := position;
+        ELSEIF checkjoint = TRUE THEN
+            target.rot.q1 := jointpos.rax_1;
+            target.rot.q2 := jointpos.rax_2;
+            target.rot.q3 := jointpos.rax_3;
+            target.rot.q4 := jointpos.rax_4;
+        ELSE
+        ENDIF
+        
+    ENDPROC
+    
+PROC reply()
+    ! Create the socket to listen for a connection on.
+        VAR socketdev welcome_socket;
+        SocketCreate welcome_socket;
+
+        ! Bind the socket to the host and port.
+        SocketBind welcome_socket,host,port1;
+
+        ! Listen on the welcome socket.
+        SocketListen welcome_socket;
+
+        ! Accept a connection on the host and port.
+        SocketAccept welcome_socket,client_socket;
+        SocketSend client_socket \Str:=("HERE");
+        ! Close the welcome socket, as it is no longer needed.
+        SocketClose welcome_socket;
+    
+ENDPROC
+    PROC ListenForAndAcceptConnection()
+
         ! Create the socket to listen for a connection on.
         VAR socketdev welcome_socket;
         SocketCreate welcome_socket;
-        
+
         ! Bind the socket to the host and port.
-        SocketBind welcome_socket, host, port;
-        
+        SocketBind welcome_socket,host,port;
+
         ! Listen on the welcome socket.
         SocketListen welcome_socket;
-        
+
         ! Accept a connection on the host and port.
-        SocketAccept welcome_socket, client_socket;
-        
+        SocketAccept welcome_socket,client_socket;
+
         ! Close the welcome socket, as it is no longer needed.
         SocketClose welcome_socket;
-        
+
     ENDPROC
-    
+
     ! Close the connection to the client.
     PROC CloseConnection()
         SocketClose client_socket;
     ENDPROC
-		
+
+    PROC starter_func()
+        
+        IF starter = TRUE  THEN
+            
+            position:=[200,0,147];
+            jointpos:=[0,0,0,0,0,0];
+            speed_value:=[300,500,5000,1000];
+            IO_signal :=[0,0,0,0,100,0];
+            starter:= FALSE;
+            selected := FALSE;
+            move_please:= FALSE;
+            checkpos:=FALSE;
+            checkjoint:=FALSE;
+            checkinput:=FALSE;
+            checkmode:=FALSE;
+        ENDIF
+        
+    ENDPROC
+    
 ENDMODULE
