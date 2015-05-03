@@ -13,38 +13,26 @@ robot_IP_address = '127.0.0.1';
 robot_port = 1027;
 
 % Open a TCP connection to the robot.
+%str='wohoo';
 
 socket = tcpip(robot_IP_address, robot_port);
 set(socket, 'ReadAsyncMode', 'continuous');
-fprintf('bopen\n')
+
 fopen(socket);
-fprintf('aopen\n')
+
 % Check if the connection is valid.
 if(~isequal(get(socket, 'Status'), 'open'))
     warning(['Could not open TCP connection A=to ', robot_IP_address, ' on port ', robot_port]);
     return;
 end
-fprintf('waiting\n')
-%request special string
 
-c = fread(socket,4);
-c = (char(c)');
-c
-fprintf('receive\n')
+
+c = fgetl(socket);
+
 
 fclose(socket);
-fprintf('close\n')
-%ensure that the special code are received
-if strcmp(c,'HERE') == 1
-    
-    c = 'GREEN';
-else
-    
-    c='RED';
-end
-
 catch
-    %if error
-    c= 'RED';
+    errordlg('DISCONNECTED');
+    c= '0';
 end
 

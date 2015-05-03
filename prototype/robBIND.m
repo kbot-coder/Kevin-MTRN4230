@@ -1,29 +1,36 @@
-function cond = robBIND
+function robBIND
 
-%initialize c to empty
-    c= '';
-    
-    c=sender('KNOK');
-    c
-    %if succesfully send open receive
-    pause(0.001);
-    if strcmp(c,'GREEN') == 1
-        fprintf('gagaga\n')
-        c = receive();
+
+listening = 1;
+time =1;
+
+while listening == 1
+    time = time +1
+    if time == 2
+        
     else
-        c= 'RED';
+        pause(5);
     end
-    c
+    sender('KNOK');
+    %fclose(socket);  
+    pause(1);
+    c='0';
+    c = receive();
     
-    if strcmp(c,'GREEN')== 1 
-        cond = 'GREEN';
-   
+    if strcmp(c,'HERE')== 1 
+        
+        fprintf('CONNECTED\N');
+       
+        listening =1;
     else
-        cond = 'RED';
+       
         errordlg('DISCONNECTED');
-        
+        listening = 0;
         
     end
+    
+   
+    
        
 
-
+end
