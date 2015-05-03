@@ -1,7 +1,7 @@
 % Script to communicate with IRB120 robot system
 % Mark Whitty
 % 140324
-function sender(str)
+function c = sender(str)
 
 % The robot's IP address.
 % robot_IP_address = '192.168.2.1';
@@ -32,8 +32,9 @@ fwrite(socket, str);
 
 
 fclose(socket);
-
+c = 'GREEN';
 catch
-    errordlg('DISCONNECTED');
+%     errordlg('DISCONNECTED');
+c='RED';
 end
 
