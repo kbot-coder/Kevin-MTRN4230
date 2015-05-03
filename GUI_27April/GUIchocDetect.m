@@ -22,7 +22,7 @@ function varargout = GUIchocDetect(varargin)
 
 % Edit the above text to modify the response to help GUIchocDetect
 
-% Last Modified by GUIDE v2.5 30-Apr-2015 02:10:49
+% Last Modified by GUIDE v2.5 04-May-2015 01:04:48
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -205,3 +205,10 @@ set(handles.edit1,'string', 'It is not in.. Yet '  );
 set(handles.uitable1, 'data', handles.chocString);
 guidata(hObject, handles);
 
+
+
+% --- Executes on button press in pushbutton3.
+function pushbutton3_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
