@@ -3,6 +3,7 @@
 %% outputs_     
 function c = plotBoxConv(im)
     c = [];
+    d = {};
     theta = 0;
     I2 = im;
     % masking the image so that the boxes can be clearly detected
@@ -28,18 +29,25 @@ function c = plotBoxConv(im)
         if i>length(s)
             break;
         end
-        X = s(i).Centroid(1);
-        Y = s(i).Centroid(2);
+        X = round(s(i).Centroid(1));
+        Y = round(480-s(i).Centroid(2));%%%%%%%%%%%%%%%%%%%%%%
         theta = s(i).Orientation/180*pi;
         cT = cos(theta);
         sT = sin(theta);   
-        xs = [70, 70, -70, -70, 70];
+        xs = [68, 68, -68, -68, 68];
         ys = [38, -38, -38, 38, 38];
         rec = [cT , sT; -sT, cT]*[xs;ys]+...
             [s(i).Centroid' s(i).Centroid' s(i).Centroid' s(i).Centroid' s(i).Centroid'];
+        rec(2,:) = 480 - rec(2,:);%%%%%%%%%%%%%%%%%%%
         plot( X, Y,'ro');
         plot(rec(1,:),rec(2,:),'g');
-        c(i) = [ X, Y, theta];
+        c(i,:) = [ X, Y, theta];
+        
+        d{i}(1,:) = [X-(51*cT), Y-(51*sT)];
+        d{i}(2,:) = [X-(17*cT), Y-(17*sT)];
+        d{i}(3,:) = [X+(17*cT), Y+(17*sT)];
+        d{i}(4,:) = [X+(51*cT), Y+(51*sT)];
+        plot(d{i}(:,1), d{i}(:,2), 'b*')
     end
 return
 end

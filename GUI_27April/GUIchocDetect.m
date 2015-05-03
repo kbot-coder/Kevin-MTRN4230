@@ -22,7 +22,7 @@ function varargout = GUIchocDetect(varargin)
 
 % Edit the above text to modify the response to help GUIchocDetect
 
-% Last Modified by GUIDE v2.5 04-May-2015 01:04:48
+% Last Modified by GUIDE v2.5 04-May-2015 01:12:36
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -54,17 +54,31 @@ function GUIchocDetect_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Choose default command line output for GUIchocDetect
 handles.output = hObject;
-handles.chocStat = [];
-handles.chocRec = [];
-handles.chocPicked = 0;
-handles.chocString = {};
 
+% Holds all information of the chocolates
+handles.chocStat    = [];
+handles.chocRec     = [];
+handles.chocPicked  = 0;
+handles.chocString  = {};
+
+% Holds all information of the boxes
+handles.boxStat     = [];
+handles.boxString   = {};
 
 
 % Show what need to need to be done before start
+
+% must be replace with vid preview.
 axes(handles.axesVid);
 chocImage = imread('Training set/IMG_005.jpg');
 imshow(chocImage);
+
+axes(handles.axesVid_C);
+boxxie = imread('boxxie.jpg');
+imshow(boxxie);
+
+
+
 
 set(handles.edit1,'string', 'YES MASTER,  what should I do? ' );
 
@@ -207,8 +221,23 @@ guidata(hObject, handles);
 
 
 
-% --- Executes on button press in pushbutton3.
-function pushbutton3_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton3 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% --- Executes on button press in pushbuttonBox.
+function pushbuttonBox_Callback(hObject, eventdata, handles)
+set(handles.edit1,'string', 'Detecting boxes');
+
+axes(handles.axesDetect_C);hold on;
+im = imread('boxxie.jpg');
+handles.boxStat = plotBoxConv(im);
+set(handles.axesDetect_C,'color','none','Xlim'...
+                ,[0 640],'ylim',[0 480], 'Xtick',[], 'Ytick',[]);
+hold off;
+set(handles.edit1,'string', 'Detected');
+
+
+handles.boxString = data2str(handles.boxStat,0,0);
+set(handles.uitableBoxes, 'data', handles.boxString );
+
+
+
+guidata(hObject, handles);
+
