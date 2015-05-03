@@ -15,11 +15,11 @@ MODULE TASK2
     ! ************************************
     VAR num size;
     VAR string received_str;
-    
+    PERS robtarget target :=[[175,0,147],[0,0,-1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
     ! Current robot status value
     ! ***********************************************
-    PERS pos position:=[175,520,147]; !position of the robot
-    PERS robjoint jointpos:=[0,0,0,0,500,0]; ! for the rotation of the end effector 
+    VAR pos position:=[175,520,147]; !position of the robot
+    VAR robjoint jointpos:=[0,0,0,0,500,0]; ! for the rotation of the end effector 
     PERS speeddata speed_value:=[300,500,5000,1000];
     PERS robjoint IO_signal :=[0,0,0,0,100,0];
     PERS string signalBind:="";
@@ -45,6 +45,7 @@ MODULE TASK2
     CONST string host:="127.0.0.1";
     CONST num port:=1025;
     CONST num port1:=1027;
+    CONST string start := "START";
 
 
     PROC MainServer()
@@ -68,7 +69,7 @@ MODULE TASK2
         ConvStrtoVal received_str; !convert string to value function
         
         modechecker mode; !check mode function
-          
+        getPosition position,jointpos; ! store position and jointpos as target.
         task1Runner task1Trig; ! use o trigger moving task
         
         IOtask; !triger IO 
@@ -90,7 +91,11 @@ PROC ConvStrToVal(string received_str)
         ELSEIF size = 4 THEN
         
         signalBind:= received_str;
-            
+        
+        ELSEIF size = 5 THEN
+            IF received_str = start THEN               
+            task1Trig :=1;  ! if size = 5 check if receives_str = start ie string "START" triger task1
+            ENDIF
         ELSE
             ! the received_str will be store in one of 3 varible
             ! can be position [x,y,z] for position.
@@ -209,6 +214,19 @@ ENDPROC
             
         ENDIF
 
+    ENDPROC
+    
+    PROC getPosition(pos position, robjoint jointpos)
+        IF checkpos = TRUE THEN
+            target.trans := position;
+        ELSEIF checkjoint = TRUE THEN
+            target.rot.q1 := jointpos.rax_1;
+            target.rot.q2 := jointpos.rax_2;
+            target.rot.q3 := jointpos.rax_3;
+            target.rot.q4 := jointpos.rax_4;
+        ELSE
+        ENDIF
+        
     ENDPROC
     
 PROC reply()
