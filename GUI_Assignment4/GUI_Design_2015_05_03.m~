@@ -94,8 +94,6 @@ handles.timer1= timer(...
     'Period', 0.5, ...                              % Initial period is 0.1 sec.
     'TimerFcn', {@UpdateConnection,hObject,handles});  % Specify callback function that executed when timer iterated
 
-AA = [1 2 3 4 5 ; 1 2 3 4 5 ; 1 2 3 4 5];
-set(handles.ChocTable,'Data',AA);
 % Update handles structure
 guidata(hObject, handles);
 % UIWAIT makes GUI_Design_2015_05_03 wait for user response (see UIRESUME)
@@ -217,13 +215,26 @@ set ( handles.CmdStatus, 'String' ,...              % Show command in the comman
 
 % Executed when Click & GO button on Table camera pressed 
 function Get_T_Coordinate_Callback(hObject, eventdata, handles)
-[X, Y]=ginput(1); 
-data=sprintf('X = %d Y = %d',X, Y);
+[xx, yy]=ginput(1); 
+data=sprintf('X = %d Y = %d',xx, yy);
 set(handles.T_Coordinate,'string',data);
 Data = get(handles.ChocTable,'Data');
 dataSize = size(Data);
-for i=1:
-[in] = checkPoint(xx , yy , X , Y,  theta);
+selectedData = [];
+for i=1:dataSize(1),
+    in = checkPoint(xx , yy , Data(i,1) , Data(i,2),  -Data(i,3))
+    if in == 1,
+        selectedData = Data(i,:);
+    end
+end;
+set(handles.selectedChocolateTable,'Data',selectedData);
+axes(handles.axes3); cla; 
+try
+    plotRectangle(selectedData(1,1) , selectedData(1,2),  -selectedData(1,3))
+catch
+    errordlg('No chocolate detected on that particular area');
+end
+
 
 
 
@@ -397,7 +408,6 @@ image(imgTable);
 set(handles.TableCam,'xtick',[],'ytick',[]);       % Supress the axes3 axis value
 
 axes(handles.axes3);
-
 set(handles.axes3,'color','none');
 c = findChoc((imgTable));   % HERE THE CHOC DETECTION
 set(handles.axes3,'xtick',[],'ytick',[]);       % Supress the axes3 axis value
@@ -407,7 +417,10 @@ set(handles.ChocTable,'Data',handle.c); % show data chocolate on the table
 
 % Capture conveyor camera, process it, detect the box & show it in axes 4
 %imgConv=getsnapshot(handles.vid2);      % capture image from video 2 (conveyor camera)
-% imgConv=imread('converyor.jpg');
+imgConv=imread('converyor.jpg');
+axes(handles.ConvCam);
+set(handles.TableCam,'xtick',[],'ytick',[]);
+image(imgConv);
 % plotBoxConv(imgConv);                   % call function plotBoxConv to detect box
 % set(handles.axes4);  
 

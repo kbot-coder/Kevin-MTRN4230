@@ -94,8 +94,6 @@ handles.timer1= timer(...
     'Period', 0.5, ...                              % Initial period is 0.1 sec.
     'TimerFcn', {@UpdateConnection,hObject,handles});  % Specify callback function that executed when timer iterated
 
-AA = [1 2 3 4 5 ; 1 2 3 4 5 ; 1 2 3 4 5];
-set(handles.ChocTable,'Data',AA);
 % Update handles structure
 guidata(hObject, handles);
 % UIWAIT makes GUI_Design_2015_05_03 wait for user response (see UIRESUME)
@@ -410,7 +408,6 @@ image(imgTable);
 set(handles.TableCam,'xtick',[],'ytick',[]);       % Supress the axes3 axis value
 
 axes(handles.axes3);
-
 set(handles.axes3,'color','none');
 c = findChoc((imgTable));   % HERE THE CHOC DETECTION
 set(handles.axes3,'xtick',[],'ytick',[]);       % Supress the axes3 axis value
@@ -420,9 +417,14 @@ set(handles.ChocTable,'Data',handle.c); % show data chocolate on the table
 
 % Capture conveyor camera, process it, detect the box & show it in axes 4
 %imgConv=getsnapshot(handles.vid2);      % capture image from video 2 (conveyor camera)
-% imgConv=imread('converyor.jpg');
-% plotBoxConv(imgConv);                   % call function plotBoxConv to detect box
-% set(handles.axes4);  
+imgConv=imread('converyor.jpg');
+axes(handles.ConvCam);
+image(imgConv);
+set(handles.ConvCam,'xtick',[],'ytick',[]);
+axes(handles.axes4);
+set(handles.axes4,'color','none'); set(handles.axes4,'xtick',[],'ytick',[]);
+%plotBoxConv(imgConv);                   % call function plotBoxConv to detect box
+
 
 
 % --- Executes on button press in runButton.
