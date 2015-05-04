@@ -417,12 +417,15 @@ set(handles.ChocTable,'Data',handle.c); % show data chocolate on the table
 
 % Capture conveyor camera, process it, detect the box & show it in axes 4
 %imgConv=getsnapshot(handles.vid2);      % capture image from video 2 (conveyor camera)
-imgConv=imread('converyor.jpg');
+imgConv=imread('converyor1.jpg');
 axes(handles.ConvCam);
-set(handles.TableCam,'xtick',[],'ytick',[]);
 image(imgConv);
-% plotBoxConv(imgConv);                   % call function plotBoxConv to detect box
-% set(handles.axes4);  
+set(handles.ConvCam,'xtick',[],'ytick',[]);
+axes(handles.axes4);
+set(handles.axes4,'color','none'); 
+plotBoxConv(imgConv);                   % call function plotBoxConv to detect box
+set(handles.axes4,'xtick',[],'ytick',[]);
+
 
 
 % --- Executes on button press in runButton.

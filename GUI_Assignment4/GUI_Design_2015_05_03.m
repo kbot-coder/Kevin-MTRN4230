@@ -417,13 +417,14 @@ set(handles.ChocTable,'Data',handle.c); % show data chocolate on the table
 
 % Capture conveyor camera, process it, detect the box & show it in axes 4
 %imgConv=getsnapshot(handles.vid2);      % capture image from video 2 (conveyor camera)
-imgConv=imread('converyor.jpg');
+imgConv=imread('converyor3.jpg');
 axes(handles.ConvCam);
 image(imgConv);
 set(handles.ConvCam,'xtick',[],'ytick',[]);
 axes(handles.axes4);
-set(handles.axes4,'color','none'); set(handles.axes4,'xtick',[],'ytick',[]);
+set(handles.axes4,'color','none'); 
 %plotBoxConv(imgConv);                   % call function plotBoxConv to detect box
+set(handles.axes4,'xtick',[],'ytick',[]);
 
 
 
@@ -432,3 +433,7 @@ function runButton_Callback(hObject, eventdata, handles)
 % hObject    handle to runButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+function figure1_WindowKeyPressFcn(hObject, eventdata, handles)
+
+function figure1_WindowKeyReleaseFcn(hObject, eventdata, handles)
