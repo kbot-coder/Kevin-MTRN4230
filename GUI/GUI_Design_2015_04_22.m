@@ -76,17 +76,16 @@ set(handles.ConvCam,'xtick',[],'ytick',[]);     % Supress the ConvCam axis value
 set(handles.TableCam,'xtick',[],'ytick',[]);    % Supress the TableCam axis value
 
 % Just for showing logo(robot picture in axes5)
-axes(handles.axes5);
-imshow(imread('preview.jpg'));
 axes(handles.axes4);
 imshow(imread('converyor.jpg'));
 axes(handles.axes3);
-imshow(imrot90(imread('empty.png'),2));
+%imshow(imrot90(imread('empty.png'),2));
 set(handles.ConvCam,'Visible','off');
 set(handles.TableCam,'Visible','off');
 %Managing Video handles
 % handles.vid1  = videoinput('macvideo',1);
 % handles.vid2  = videoinput('macvideo',2);
+
 handles.vid1  = videoinput('winvideo',1);       % Input video 1 from table camera
 handles.vid2  = videoinput('winvideo',2);       % Input video 2 from conveyor camera
 
@@ -845,6 +844,6 @@ drawnow();  % Push matlab to show the result before executing another function
 % --- Executes when user attempts to close figure1.
 function figure1_CloseRequestFcn(hObject, eventdata, handles)
 delete(hObject);
-delete(handles.vid1);   % Delete object input vodeo 1 before closing the GUI
-delete(handles.vid2);   % Delete object input vodeo 2 before closing the GUI
-delete(handles.timer);  % Delete object timer before closing the GUI
+%delete(handles.vid1);   % Delete object input vodeo 1 before closing the GUI
+%delete(handles.vid2);   % Delete object input vodeo 2 before closing the GUI
+%delete(handles.timer);  % Delete object timer before closing the GUI
