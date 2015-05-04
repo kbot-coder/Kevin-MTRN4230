@@ -69,17 +69,30 @@ handles.CZ   = '0';     % Current end effector position on Z
 % processing result
 % axes3 for showing detected choclate
 % axes4 for showing detected box
-% ConvCam for showing conveyor camera
+% TableCam for showing conveyor camera
 % TableCam for showing table camera                      
-set(handles.axes3, 'Xlim', [-800,800], 'YLim', [0 900]); % Setting limit axes tobe respect to the image resolution
+set(handles.axes3, 'Xlim', [-900,900], 'YLim', [0 900]); % Setting limit axes tobe respect to the image resolution
 set(handles.axes3,'xtick',[],'ytick',[]);       % Supress the axes3 axis value 
 set(handles.axes4,'xtick',[],'ytick',[]);       % Supress the axes4 axis value
-set(handles.ConvCam,'xtick',[],'ytick',[]);     % Supress the ConvCam axis value
-set(handles.TableCam,'xtick',[],'ytick',[]);    % Supress the TableCam axis value
+set(handles.TableCam,'xtick',[],'ytick',[]);     % Supress the ConvCam axis value
+set(handles.ConvCam,'xtick',[],'ytick',[]);    % Supress the TableCam axis value
 
 % Just for showing logo(robot picture in axes5)
 axes(handles.axes5);
 imshow(imread('preview.jpg'));
+axes(handles.TableCam);
+% hImage = image(zeros(900,1800, 3), ... % set image frame as a the size of video image as a base for showing 
+%     'parent', handles.TableCam);
+image(imread('empty.png'));
+colormap(map);
+axis image;
+axes(handles.axes3);
+set(handles.axes3,'color','none')
+set(handles.axes3,'layer','top')
+
+% % axes(handles.TableCam);                              % set axes ConvCam for showing video 1
+% %                      % video image
+% % preview(handles.vid1,hImage);
 
 %Managing Video handles
 % handles.vid1  = videoinput('macvideo',1);
@@ -265,7 +278,7 @@ end
 %--------------------------------------------------------------------------
 % Managing Axis
 %--------------------------------------------------------------------------
-function ConvCam_CreateFcn(hObject, eventdata, handles)
+function TableCam_CreateFcn(hObject, eventdata, handles)
 % Hint: place code in OpeningFc
 % --- Executes during object creation, after setting all properties.
 
@@ -595,9 +608,9 @@ triggerconfig(handles.vid1 , 'manual');             % Set triger video as manual
 vidRes = get(handles.vid1 , 'VideoResolution');     % Get video resolution
 imWidth = vidRes(1); imHeight = vidRes(2);          % Get size of the video image
 nBands = get(handles.vid1 , 'NumberOfBands');       
-axes(handles.ConvCam);                              % set axes ConvCam for showing video 1
+axes(handles.TableCam);                              % set axes ConvCam for showing video 1
 hImage = image(zeros(imHeight,imWidth, nBands), ... % set image frame as a the size of video image as a base for showing 
-    'parent', handles.ConvCam);                     % video image
+    'parent', handles.TableCam);                     % video image
 preview(handles.vid1,hImage);                       % show video image 1 on hImage frame
 
 function StopIm_Callback(hObject, eventdata, handles)
@@ -638,7 +651,7 @@ guidata(hObject, handles);
 % Executed when Click & GO button on Table camera pressed 
 function GetC_Coordinate_Callback(hObject, eventdata, handles)
 [X, Y]=ginput(1);                                   % Get input coordinate from the table camera frame
-XR=900-Y; YR=X; XR=XR*1.5; YR=YR*1.5;               % Convert & adjust the measurement from pixle to mm
+XR=Y; YR=X; XR=XR*1.5; YR=YR*1.5;               % Convert & adjust the measurement from pixle to mm
 XR=int32(XR); YR=int32(YR);                         % Convert X & Y value into integer
 texboxStatus = sprintf('X = %d  Y = %d', XR, YR);   % Set data to be showed
 set(handles.C_Coordinate,'String',texboxStatus);    % Show value into textbox
