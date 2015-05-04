@@ -511,12 +511,24 @@ guidata(hObject, handles);
 % --- Executes when selected cell(s) is changed in uitableBox.
 function uitableBox_CellSelectionCallback(hObject, eventdata, handles)
 try
-    rowS = eventdata.Indices(1);
-    set(handles.editCommand,'string',['Box ' num2str(rowS) ' was picked'] );
+    chocN = eventdata.Indices(1);
+    set(handles.editCommand,'string',['Box ' num2str(chocN) ' was picked'] );
 
-    set(handles.uitableBox, 'data', data2str(handles.b(:,3),rowS,0));
+    set(handles.uitableRegion, 'string',...
+        data2str(handles.chocString,chocN,'string'));
 
-    set(handles.uitableRegion, 'data', data2str(handles.box{rowS}.xy,0,0));
+    tempStr = data2str(handles.chocString,chocN,'string');
+
+    %# set table data
+    set(handles.uitable1, 'data', tempStr);
+
+
+
+    %plotting the rectangle 
+    axes(handles.axesSelect);
+    plot(handles.chocRec{chocN}(1,:), handles.chocRec{chocN}(2,:), '--k'); 
+    set(handles.axesSelect,'color','none','Xlim',[0 1600],'ylim',[0 900]...
+          ,'Xtick',[], 'Ytick',[]);
 catch
 end
  guidata(hObject, handles);
