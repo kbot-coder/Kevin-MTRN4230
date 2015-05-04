@@ -82,8 +82,8 @@ imshow(imread('preview.jpg'));
 %Managing Video handles
 % handles.vid1  = videoinput('macvideo',1);
 % handles.vid2  = videoinput('macvideo',2);
-handles.vid1  = videoinput('winvideo',1);       % Input video 1 from table camera
-handles.vid2  = videoinput('winvideo',2);       % Input video 2 from conveyor camera
+% handles.vid1  = videoinput('winvideo',1);       % Input video 1 from table camera
+% handles.vid2  = videoinput('winvideo',2);       % Input video 2 from conveyor camera
 
 %Managing handles timer
 handles.timer= timer(...
@@ -614,7 +614,8 @@ preview(handles.vid2,hImage2);                      % show video image 2 on hIma
 function ImCapt_Callback(hObject, eventdata, handles)
 
 % Capture table camera, process it, detect choclate, & show it in axes 3
-imgTable=getsnapshot(handles.vid1);     % capture image from video 1 (Table camera)
+% imTable=getsnapshot(handles.vid1);     % capture image from video 1 (Table camera)
+imTable= imread('all.png');
 c=detect_chocolates(imTable);           % call function detect_chocolates to process the image to detect chocolate
 set(handles.axes3);                     % set axes 3 for showing detected chocolate
 handle.c =c;                            % data chocolate
