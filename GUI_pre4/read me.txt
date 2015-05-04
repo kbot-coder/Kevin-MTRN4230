@@ -1,0 +1,3 @@
+conn.mat 
+: imConnect = image array of the connected icon;
+: imDisconnect = image array of the disconnected icon;
