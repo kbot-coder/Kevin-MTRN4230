@@ -66,8 +66,9 @@ handles.CZ   = '0';     % Current end effector position on Z
 
 % Status of boxes and chocolates 
 % Before GUI connected & syncronize with Robot Studio 
-handles.box ={};
-handles.b   = [];
+handles.box  ={};
+handles.b    = [];
+handles.bSelect = [0 0]; %[box, region]
 
 % Managing proper ties of Axis handles for showing the video & image
 % processing result
@@ -80,6 +81,7 @@ set(handles.axes3,'xtick',[],'ytick',[]);       % Supress the axes3 axis value
 set(handles.axesConvDetect,'xtick',[],'ytick',[]);       % Supress the axes4 axis value
 set(handles.axesConvCam,'xtick',[],'ytick',[]);     % Supress the ConvCam axis value
 set(handles.TableCam,'xtick',[],'ytick',[]);    % Supress the TableCam axis value
+set(handles.axesConvDetect, 'Xlim', [0,640], 'YLim', [0 480]);
 
 set(handles.axesTableSelect,'Xlim', [0,1600], 'YLim', [0 900]);
 
@@ -214,17 +216,56 @@ sender(data);                                       % Call sender function to se
 
 % Executed when Click & GO button on Table camera pressed 
 function GetC_Coordinate_Callback(hObject, eventdata, handles)
+set(handles.editCommand,'string', 'Press ENTER to cancel' );
 [X, Y]=ginput(1);                                   % Get input coordinate from the table camera frame
 XR=900-Y; YR=X; XR=XR*1.5; YR=YR*1.5;               % Convert & adjust the measurement from pixle to mm
 XR=int32(XR); YR=int32(YR);                         % Convert X & Y value into integer
 texboxStatus = sprintf('X = %d  Y = %d', XR, YR);   % Set data to be showed
 set(handles.C_Coordinate,'String',texboxStatus);    % Show value into textbox
-sender('0');                                        % Call sender function to send '0' as linear mode
-pause(0.01);
-data=sprintf('[%d,%d,150]',XR, YR);                 % Set data to be sended 
-sender(data);                                       % Call sender function to send data
-set ( handles.CmdStatus, 'String' ,...              % Show command in the command status
-    ['Move End Efector Robot Linear to ' ] );
+% sender('0');                                        % Call sender function to send '0' as linear mode
+% pause(0.01);
+% data=sprintf('[%d,%d,150]',XR, YR);                 % Set data to be sended 
+% sender(data);                                       % Call sender function to send data
+% set ( handles.CmdStatus, 'String' ,...              % Show command in the command status
+%     ['Move End Efector Robot Linear to ' ] );
+
+inside = 0;
+siz = size(handles.b);
+for choco = 1:siz(1,1);
+    for reg = 1:4 
+        inside = inpolygon( X,Y,...
+            handles.box{choco}.rec{reg}(1,:),...
+            handles.box{choco}.rec{reg}(2,:));
+        if inside ~= 0
+            set(handles.editCommand,'string',...
+                ['Yea Baby! it is inside '   num2str(choco) ] );
+            boxID = choco;
+            handles.bSelect = [boxID , reg];
+            
+            tempStr = data2str(handles.box{boxID}.xy,reg,0);
+            set(handles.uitableRegion, 'data', tempStr);
+            
+            tempStr = data2str(handles.b(:,3),boxID,0);
+            set(handles.uitableBox, 'data', tempStr);
+            
+             %plotting the rectangle 
+            axes(handles.axesConvSelect);
+            plot(handles.box{boxID}.rec{reg}(1,:),...
+                handles.box{boxID}.rec{reg}(2,:), '--k');
+            set(handles.axesConvSelect,'color','none','Xlim'...
+                ,[0 640],'ylim',[0 480]...
+                  ,'Xtick',[], 'Ytick',[]);
+            guidata(hObject, handles);
+            return;
+        end
+    end
+end
+
+set(handles.editCommand,'string','Not In Any Box' );
+
+
+guidata(hObject, handles);
+
 
 % Executed when Click & GO button on Table camera pressed 
 function Get_T_Coordinate_Callback(hObject, eventdata, handles)
@@ -465,7 +506,7 @@ function radiobuttonConnection_Callback(hObject, eventdata, handles)
 
 
 
-function editCommand_Callback(hObject, eventdata, handles)
+function editCommand_Callback(hObject, eventdata, ~)
 % hObject    handle to editCommand (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -499,36 +540,66 @@ axes(handles.axesConvDetect);hold on;
 [handles.b ,handles.box]=plotBoxConv(imgConv); hold off; % detect box
 
 set(handles.axesConvDetect,'color','none'); 
-set(handles.axesConvDetect, 'Xlim', [0,640], 'YLim', [0 480]);
 set(handles.axesConvDetect,'xtick',[],'ytick',[]);
 
 set(handles.uitableBox, 'data', handles.b(:,3));
 
-
+set(handles.editCommand, 'String', 'Done Boxes Detection');
 guidata(hObject, handles);
 
 
 % --- Executes when selected cell(s) is changed in uitableBox.
 function uitableBox_CellSelectionCallback(hObject, eventdata, handles)
 try
-    chocN = eventdata.Indices(1);
-    set(handles.editCommand,'string',['Box ' num2str(chocN) ' was picked'] );
+    rowS = eventdata.Indices(1);
+    set(handles.editCommand,'string',['Box ' num2str(rowS) ' was picked'] );
 
-    set(handles.uitableRegion, 'string',...
-        data2str(handles.chocString,chocN,'string'));
+    set(handles.uitableBox, 'data', data2str(handles.b(:,3),rowS,0));
 
-    tempStr = data2str(handles.chocString,chocN,'string');
-
-    %# set table data
-    set(handles.uitable1, 'data', tempStr);
-
-
-
-    %plotting the rectangle 
-    axes(handles.axesSelect);
-    plot(handles.chocRec{chocN}(1,:), handles.chocRec{chocN}(2,:), '--k'); 
-    set(handles.axesSelect,'color','none','Xlim',[0 1600],'ylim',[0 900]...
-          ,'Xtick',[], 'Ytick',[]);
+    set(handles.uitableRegion, 'data', data2str(handles.box{rowS}.xy,0,0));
+    handles.bSelect(1,1) = rowS ;
 catch
 end
- guidata(hObject, handles);
+
+guidata(hObject, handles);
+
+
+% --- Executes when selected cell(s) is changed in uitableRegion.
+function uitableRegion_CellSelectionCallback(hObject, eventdata, handles)
+try    
+    boxID = handles.bSelect(1,1);
+    rowS = eventdata.Indices(1);
+    set(handles.editCommand,'string',['Region '...
+        num2str(rowS) ' of box ' num2str(boxID) ' was picked'] );
+    
+    tempStr = data2str(handles.box{boxID}.xy, rowS,0 );    
+    
+    set(handles.uitableRegion, 'data', tempStr);
+    handles.bSelect(1,2) = rowS ;
+    
+    axes(handles.axesConvSelect);
+    plot(handles.box{boxID}.rec{rowS}(1,:),...
+        handles.box{boxID}.rec{rowS}(2,:), '--k');
+    set(handles.axesConvSelect, 'Xlim', [0,640], 'YLim', [0 480]...
+        ,'color','none' ,'xtick',[],'ytick',[]);
+catch
+end
+guidata(hObject, handles);
+
+    
+    
+    
+    
+    
+
+
+% --- Executes on key release with focus on figure1 and none of its controls.
+function figure1_KeyReleaseFcn(hObject, eventdata, handles)
+k=get(gcf,'CurrentCharacter');
+disp(k);
+if k =='q'
+    close all;clc;clear;
+end
+if k =='space'
+    uwait(errordlg('I',''));
+end
