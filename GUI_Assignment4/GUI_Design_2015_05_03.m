@@ -70,6 +70,7 @@ handles.CZ   = '0';     % Current end effector position on Z
 % ConvCam for showing conveyor camera
 % TableCam for showing table camera                      
 set(handles.axes3, 'Xlim', [0,1600], 'YLim', [0 900]); % Setting limit axes tobe respect to the image resolution
+set(handles.axes4, 'Xlim', [0,640], 'YLim', [0 480]);
 set(handles.axes3,'xtick',[],'ytick',[]);       % Supress the axes3 axis value
 set(handles.axes4,'xtick',[],'ytick',[]);       % Supress the axes4 axis value
 set(handles.ConvCam,'xtick',[],'ytick',[]);     % Supress the ConvCam axis value
@@ -201,17 +202,11 @@ sender(data);                                       % Call sender function to se
 
 % Executed when Click & GO button on Table camera pressed 
 function GetC_Coordinate_Callback(hObject, eventdata, handles)
-[X, Y]=ginput(1);                                   % Get input coordinate from the table camera frame
-XR=900-Y; YR=X; XR=XR*1.5; YR=YR*1.5;               % Convert & adjust the measurement from pixle to mm
-XR=int32(XR); YR=int32(YR);                         % Convert X & Y value into integer
-texboxStatus = sprintf('X = %d  Y = %d', XR, YR);   % Set data to be showed
-set(handles.C_Coordinate,'String',texboxStatus);    % Show value into textbox
-sender('0');                                        % Call sender function to send '0' as linear mode
-pause(0.01);
-data=sprintf('[%d,%d,150]',XR, YR);                 % Set data to be sended 
-sender(data);                                       % Call sender function to send data
-set ( handles.CmdStatus, 'String' ,...              % Show command in the command status
-    ['Move End Efector Robot Linear to ' ] );
+[xx, yy]=ginput(1);                                         % Get input coordinate from the table camera frame
+[Xr , Yr] = conveyor2robot(xx,yy);
+texboxStatus = sprintf('GO to  X = %d  Y = %d', Xr, Yr);    % Set data to be showed
+set(handles.C_Coordinate,'String',texboxStatus);            % Show value into textbox
+
 
 % Executed when Click & GO button on Table camera pressed 
 function Get_T_Coordinate_Callback(hObject, eventdata, handles)
@@ -230,8 +225,14 @@ end;
 set(handles.selectedChocolateTable,'Data',selectedData);
 axes(handles.axes3); cla; 
 try
-    plotRectangle(selectedData(1,1) , selectedData(1,2),  -selectedData(1,3))
+    plotRectangle(selectedData(1,1) , selectedData(1,2),  -selectedData(1,3));
+    [Xr , Yr]=table2robot(selectedData(1,1) , selectedData(1,2));
+    datastring = sprintf('GO to X = %d , Y = %d , Z = 150',Xr,Yr);
+    set(handles.T_Coordinate,'string',datastring);
 catch
+    [Xr , Yr]=table2robot(xx , yy);
+    datastring = sprintf('GO to X = %d , Y = %d , Z = 150',Xr,Yr);
+    set(handles.T_Coordinate,'string',datastring);
     errordlg('No chocolate detected on that particular area');
 end
 
