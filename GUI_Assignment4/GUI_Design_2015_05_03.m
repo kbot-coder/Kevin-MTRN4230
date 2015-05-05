@@ -76,13 +76,6 @@ set(handles.axes4,'xtick',[],'ytick',[]);       % Supress the axes4 axis value
 set(handles.ConvCam,'xtick',[],'ytick',[]);     % Supress the ConvCam axis value
 set(handles.TableCam,'xtick',[],'ytick',[]);    % Supress the TableCam axis value
 
-% axes(handles.axes4);
-% imshow(imread('converyor.jpg'));
-% axes(handles.axes3);
-% imshow(imrot90(imread('empty.png'),2));
-% set(handles.ConvCam,'Visible','off');
-% set(handles.TableCam,'Visible','off');
-
 %Managing handles timer
 handles.timer= timer(...
     'ExecutionMode', 'fixedRate', ...               % Run timer repeatedly in fix rate
@@ -123,7 +116,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), ...
 end
 
 %-------------------Command Output & Status Robot--------------------------
-
 
 % Texbox for showing coordinate in conveyor camera
 % that will be sending to the robot on Click n GO operation
@@ -398,9 +390,6 @@ end
 
 % --- Executes on button press in pushbutton38.
 function pushbutton38_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton38 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 % Capture table camera, process it, detect choclate, & show it in axes 3
 %imgTable=getsnapshot(handles.vid1);     % capture image from video 1 (Table camera)
 imgTable=imread('IMG_013.jpg');
