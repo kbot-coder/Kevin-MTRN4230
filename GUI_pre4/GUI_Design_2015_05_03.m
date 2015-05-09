@@ -200,7 +200,6 @@ function axesConvCam_CreateFcn(hObject, eventdata, handles)
 % Managing Button Object
 %--------------------------------------------------------------------------
 
-
 %------------------------Setting Speed Button------------------------------
 function SpeedButton_Callback(hObject, eventdata, handles)
 handles.Speed= get(handles.editSpeed, 'string');    % Get speed data input from the textbox
@@ -210,7 +209,6 @@ data=sprintf('[%s,%s,%s,%s,%s,0]'...                % Set data tobe sended as st
     ,handles.Vac,handles.Sol...
     ,handles.CRun,handles.CDir,handles.Speed);
 sender(data);                                       % Call sender function to send speed data
-
 
 %--------------------------Click & GO Button-------------------------------
 
@@ -273,25 +271,23 @@ set(handles.axesConvSelect,'color','none','Xlim'...
     ,[0 640],'ylim',[0 480]...
       ,'Xtick',[], 'Ytick',[]);
 
-
 guidata(hObject, handles);
 
 
 % Executed when Click & GO button on Table camera pressed 
 function Get_T_Coordinate_Callback(hObject, eventdata, handles)
 [xx, yy]=ginput(1); 
-data=sprintf('X = %d Y = %d',xx, yy);
-set(handles.T_Coordinate,'string',data);
-Data = get(handles.ChocTable,'Data');
+Data = handles.chocolates;
 dataSize = size(Data);
 selectedData = [];
+Row = [];
 for i=1:dataSize(1),
-    in = checkPoint(xx , yy , Data(i,1) , Data(i,2),  -Data(i,3))
+    in = checkPoint(xx , yy , Data(i,1) , Data(i,2),  -Data(i,3));
     if in == 1,
         selectedData = Data(i,:);
+        Row = [Row,i];
     end
 end;
-set(handles.selectedChocolateTable,'Data',selectedData);
 axes(handles.axesTableSelect); cla; 
 set(handles.axesTableSelect,'color','none');
 try
@@ -299,7 +295,13 @@ try
 catch
     errordlg('No chocolate detected on that particular area');
 end
-
+handles.chocolatesStr = strcat('<html><body bgcolor="#FFFFFF" text="#000000" width="100px">', ...
+            handles.chocolatesStr,'</span></html>');
+handles.chocolatesStr(Row,:) = strcat('<html><body bgcolor="#0000FF" text="#FFFFFF" width="100px">', ...
+            handles.chocolatesStr(Row,:),'</span></html>');
+set(handles.ChocTable,'Data',handles.chocolatesStr);
+axes(handles.axes3); cla;
+guidata(hObject, handles);
 
 
 
@@ -358,7 +360,7 @@ set ( handles.CmdStatus, 'String' , 'Move to Calibrate Position' ); % Show in th
 
 %------------------- Managing Table Object---------------------------------
 % Creating table object to show the list of detected chocolate
-function ChocTable_CreateFcn(hObject, eventdata, handles)
+function ChocTable1_CreateFcn(hObject, eventdata, handles)
 
 
 %------------------------TIMER FUNCTION------------------------------------
@@ -404,14 +406,14 @@ function showImage(hObject,handles)
     guidata(hObject, handles);
 
 
-% --- Executes when selected cell(s) is changed in ChocTable.
-function ChocTable_CellSelectionCallback(hObject, eventdata, handles)
-% hObject    handle to ChocTable (see GCBO)
+% --- Executes when selected cell(s) is changed in ChocTable1.
+function ChocTable1_CellSelectionCallback(hObject, eventdata, handles)
+% hObject    handle to ChocTable1 (see GCBO)
 % eventdata  structure with the following fields (see MATLAB.UI.CONTROL.TABLE)
 %	Indices: row and column indices of the cell(s) currently selecteds
 % handles    structure with handles and user data (see GUIDATA)
 handles.selectedRow = eventdata.Indices(1);
-Data = get(handles.ChocTable,'Data');
+Data = get(handles.ChocTable1,'Data');
 selectedData = Data(handles.selectedRow,:);
 set(handles.selectedChocolateTable,'Data',selectedData);
 axes(handles.axes3); cla;
@@ -428,7 +430,7 @@ function pushbutton36_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in selectGroupButton.
 function selectGroupButton_Callback(hObject, eventdata, handles)
-Data = get(handles.ChocTable,'Data');
+Data = get(handles.ChocTable1,'Data');
 flavourColoum = Data(:,6); 
 switch get(get(handles.selectGroup,'SelectedObject'),'Tag')
     case 'selectMilk',  
@@ -477,8 +479,15 @@ set(handles.axes3,'color','none');
 c = findChoc((imgTable));   % HERE THE CHOC DETECTION
 set(handles.axes3,'xtick',[],'ytick',[]);       % Supress the axes3 axis value
 
-handle.c =c;                            % data chocolate
-set(handles.ChocTable,'Data',handle.c); % show data chocolate on the table 
+%cc = uisetcolor();
+%c255 = color(1,1:3);
+%clr = dec2hex(round(cc*255),2)'; 
+handles.chocolates =c(:,[1:3 6 8]);
+handles.chocolatesStr =reshape(strtrim(cellstr(num2str(handles.chocolates(:)))),...
+        size(handles.chocolates));
+% DataS = strcat('<html><body bgcolor="#0000FF" text="#FFFFFF" width="100px">', ...
+%             DataS,'</span></html>');
+set(handles.ChocTable,'Data',handles.chocolatesStr); % show data chocolate on the table 
 
 % Capture conveyor camera, process it, detect the box & show it in axes 4
 %imgConv=getsnapshot(handles.vid2);      % capture image from video 2 (conveyor camera)
@@ -492,6 +501,7 @@ set(handles.ChocTable,'Data',handle.c); % show data chocolate on the table
 % set(handles.axesConvDetect,'xtick',[],'ytick',[]);
 
 set(handles.editCommand,'string','Done Detection');
+guidata(hObject, handles);
 
 
 
@@ -596,13 +606,6 @@ catch
 end
 guidata(hObject, handles);
 
-    
-    
-    
-    
-    
-
-
 % --- Executes on key release with focus on figure1 and none of its controls.
 function figure1_KeyReleaseFcn(hObject, eventdata, handles)
 k=get(gcf,'CurrentCharacter');
@@ -612,4 +615,210 @@ if k =='q'
 end
 if k =='/'
     uwait(errordlg('I LOVE CHOCOLATES', 'I LOVE CHOCOLATES'));
+end
+
+
+% --- Executes when selected cell(s) is changed in ChocTable.
+function ChocTable_CellSelectionCallback(hObject, eventdata, handles)
+% hObject    handle to ChocTable (see GCBO)
+% eventdata  structure with the following fields (see MATLAB.UI.CONTROL.TABLE)
+%	Indices: row and column indices of the cell(s) currently selecteds
+% handles    structure with handles and user data (see GUIDATA)
+try
+handles.selectedRow = eventdata.Indices(1);
+selectedData = handles.chocolates(handles.selectedRow,:);
+handles.chocolatesStr = strcat('<html><body bgcolor="#FFFFFF" text="#000000" width="100px">', ...
+            handles.chocolatesStr,'</span></html>');
+handles.chocolatesStr(handles.selectedRow,:) = strcat('<html><body bgcolor="#0000FF" text="#FFFFFF" width="100px">', ...
+            handles.chocolatesStr(handles.selectedRow,:),'</span></html>');
+set(handles.ChocTable,'Data',handles.chocolatesStr);
+axes(handles.axes3); cla;
+plotRectangle(selectedData(1,1) , selectedData(1,2),  -selectedData(1,3))
+catch
+end
+guidata(hObject, handles);
+%disp(eventdata);
+
+
+
+% --- Executes on button press in checkbox19.
+function checkbox19_Callback(hObject, eventdata, handles)
+% hObject    handle to checkbox19 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkbox19
+
+
+% --- Executes on button press in checkbox20.
+function checkbox20_Callback(hObject, eventdata, handles)
+% hObject    handle to checkbox20 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkbox20
+
+
+% --- Executes on button press in checkbox21.
+function checkbox21_Callback(hObject, eventdata, handles)
+% hObject    handle to checkbox21 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkbox21
+
+
+% --- Executes on button press in checkbox22.
+function checkbox22_Callback(hObject, eventdata, handles)
+% hObject    handle to checkbox22 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkbox22
+
+
+% --- Executes on button press in checkbox23.
+function checkbox23_Callback(hObject, eventdata, handles)
+% hObject    handle to checkbox23 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkbox23
+
+
+
+function edit43_Callback(hObject, eventdata, handles)
+% hObject    handle to edit43 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit43 as text
+%        str2double(get(hObject,'String')) returns contents of edit43 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit43_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit43 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit45_Callback(hObject, eventdata, handles)
+% hObject    handle to edit45 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit45 as text
+%        str2double(get(hObject,'String')) returns contents of edit45 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit45_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit45 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit46_Callback(hObject, eventdata, handles)
+% hObject    handle to edit46 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit46 as text
+%        str2double(get(hObject,'String')) returns contents of edit46 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit46_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit46 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit47_Callback(hObject, eventdata, handles)
+% hObject    handle to edit47 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit47 as text
+%        str2double(get(hObject,'String')) returns contents of edit47 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit47_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit47 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit48_Callback(hObject, eventdata, handles)
+% hObject    handle to edit48 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit48 as text
+%        str2double(get(hObject,'String')) returns contents of edit48 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit48_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit48 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit49_Callback(hObject, eventdata, handles)
+% hObject    handle to edit49 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit49 as text
+%        str2double(get(hObject,'String')) returns contents of edit49 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit49_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit49 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
 end
