@@ -74,6 +74,7 @@ handles.pickTarget = [];
 handles.placeTarget = [];
 handles.selectedChocolate = [];
 handles.zTable = 150;
+handles.placeTable = [];
 
 % Managing proper ties of Axis handles for showing the video & image
 % processing result
@@ -320,13 +321,15 @@ switch get(get(handles.singleSelection,'SelectedObject'),'Tag')
         theta = theta*pi/180;
         newPlaceTarget = [double(Xr) , double(Yr) , handles.zTable , ...
                 theta];
+        newPlaceTable = [xx , yy , theta] ;
+        handles.placeTable = [handles.placeTable ; newPlaceTable];
         handles.placeTarget = [handles.placeTarget ; newPlaceTarget];
         set(handles.placeTargetList,'Data',handles.placeTarget);
         set(handles.nPlaceTargetShow,'string',...
                 num2str(length(handles.placeTarget(:,1))));
         axes(handles.placeTargetAxes); hold on;
         set(handles.placeTargetAxes,'color','none');
-        plotTarget(xx,yy,theta); hold off;
+        plotTarget(handles.placeTable); hold off;
 end
 
 
@@ -842,64 +845,64 @@ function checkbox24_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of checkbox24
 
 
-% --- Executes on button press in checkbox25.
-function checkbox25_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox25 (see GCBO)
+% --- Executes on button press in selectMilk.
+function selectMilk_Callback(hObject, eventdata, handles)
+% hObject    handle to selectMilk (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of checkbox25
+% Hint: get(hObject,'Value') returns toggle state of selectMilk
 
 
-% --- Executes on button press in checkbox26.
-function checkbox26_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox26 (see GCBO)
+% --- Executes on button press in selectDark.
+function selectDark_Callback(hObject, eventdata, handles)
+% hObject    handle to selectDark (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of checkbox26
+% Hint: get(hObject,'Value') returns toggle state of selectDark
 
 
-% --- Executes on button press in checkbox28.
-function checkbox28_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox28 (see GCBO)
+% --- Executes on button press in selectMint.
+function selectMint_Callback(hObject, eventdata, handles)
+% hObject    handle to selectMint (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of checkbox28
+% Hint: get(hObject,'Value') returns toggle state of selectMint
 
 
-% --- Executes on button press in checkbox29.
-function checkbox29_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox29 (see GCBO)
+% --- Executes on button press in selectOrange.
+function selectOrange_Callback(hObject, eventdata, handles)
+% hObject    handle to selectOrange (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of checkbox29
+% Hint: get(hObject,'Value') returns toggle state of selectOrange
 
 
-% --- Executes on button press in checkbox30.
-function checkbox30_Callback(hObject, eventdata, handles)
-% hObject    handle to checkbox30 (see GCBO)
+% --- Executes on button press in selectBack.
+function selectBack_Callback(hObject, eventdata, handles)
+% hObject    handle to selectBack (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of checkbox30
+% Hint: get(hObject,'Value') returns toggle state of selectBack
 
 
 
-function edit52_Callback(hObject, eventdata, handles)
-% hObject    handle to edit52 (see GCBO)
+function nBackInput_Callback(hObject, eventdata, handles)
+% hObject    handle to nBackInput (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit52 as text
-%        str2double(get(hObject,'String')) returns contents of edit52 as a double
+% Hints: get(hObject,'String') returns contents of nBackInput as text
+%        str2double(get(hObject,'String')) returns contents of nBackInput as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function edit52_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit52 (see GCBO)
+function nBackInput_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to nBackInput (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -911,18 +914,18 @@ end
 
 
 
-function edit53_Callback(hObject, eventdata, handles)
-% hObject    handle to edit53 (see GCBO)
+function nMintInput_Callback(hObject, eventdata, handles)
+% hObject    handle to nMintInput (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit53 as text
-%        str2double(get(hObject,'String')) returns contents of edit53 as a double
+% Hints: get(hObject,'String') returns contents of nMintInput as text
+%        str2double(get(hObject,'String')) returns contents of nMintInput as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function edit53_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit53 (see GCBO)
+function nMintInput_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to nMintInput (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -934,18 +937,18 @@ end
 
 
 
-function edit54_Callback(hObject, eventdata, handles)
-% hObject    handle to edit54 (see GCBO)
+function nMilkInput_Callback(hObject, eventdata, handles)
+% hObject    handle to nMilkInput (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit54 as text
-%        str2double(get(hObject,'String')) returns contents of edit54 as a double
+% Hints: get(hObject,'String') returns contents of nMilkInput as text
+%        str2double(get(hObject,'String')) returns contents of nMilkInput as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function edit54_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit54 (see GCBO)
+function nMilkInput_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to nMilkInput (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -957,18 +960,18 @@ end
 
 
 
-function edit55_Callback(hObject, eventdata, handles)
-% hObject    handle to edit55 (see GCBO)
+function nDarkInput_Callback(hObject, eventdata, handles)
+% hObject    handle to nDarkInput (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit55 as text
-%        str2double(get(hObject,'String')) returns contents of edit55 as a double
+% Hints: get(hObject,'String') returns contents of nDarkInput as text
+%        str2double(get(hObject,'String')) returns contents of nDarkInput as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function edit55_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit55 (see GCBO)
+function nDarkInput_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to nDarkInput (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -980,18 +983,18 @@ end
 
 
 
-function edit56_Callback(hObject, eventdata, handles)
-% hObject    handle to edit56 (see GCBO)
+function nOrangeInput_Callback(hObject, eventdata, handles)
+% hObject    handle to nOrangeInput (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit56 as text
-%        str2double(get(hObject,'String')) returns contents of edit56 as a double
+% Hints: get(hObject,'String') returns contents of nOrangeInput as text
+%        str2double(get(hObject,'String')) returns contents of nOrangeInput as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function edit56_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit56 (see GCBO)
+function nOrangeInput_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to nOrangeInput (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1004,9 +1007,83 @@ end
 
 % --- Executes on button press in pushbutton41.
 function pushbutton41_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton41 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+
+try
+Data = handles.chocolates;
+flavourColoum = Data(:,4);
+selectedData = [];
+if get(handles.selectMilk,'value')==1,
+    Nstr = get(handles.nMilkInput,'string');
+    if strcmp(Nstr,'all')==1,
+        milkRow = find(flavourColoum==1);
+        selectedData = [selectedData ; Data(milkRow,:)];
+    else
+        N = uint16(str2double(Nstr));
+        milkRow = find(flavourColoum==1);
+        selectedData = [selectedData ; Data(milkRow(1:N),:)];
+    end
+end
+
+if get(handles.selectDark,'value')==1,
+    Nstr = get(handles.nDarkInput,'string');
+    darkRow = find(flavourColoum==2);
+    if strcmp(Nstr,'all')==1,
+        selectedData = [selectedData ; Data(darkRow,:)];
+    else
+        N = uint16(str2double(Nstr));
+        selectedData = [selectedData ; Data(darkRow(1:N),:)];
+    end
+end
+if get(handles.selectOrange,'value')==1,
+    Nstr = get(handles.nOrangeInput,'string');
+    orangeRow = find(flavourColoum==3);
+    if strcmp(Nstr,'all')==1,
+        selectedData = [selectedData ; Data(orangeRow,:)];
+    else
+        N = uint16(str2double(Nstr));
+        selectedData = [selectedData ; Data(orangeRow(1:N),:)];
+    end
+end
+if get(handles.selectMint,'value')==1,
+    Nstr = get(handles.nMintInput,'string');
+    mintRow = find(flavourColoum==4);
+    if strcmp(Nstr,'all')==1,
+        selectedData = [selectedData ; Data(mintRow,:)];
+    else
+        N = uint16(str2double(Nstr));
+        selectedData = [selectedData ; Data(mintRow(1:N),:)];
+    end
+end
+if get(handles.selectBack,'value')==1,
+    Nstr = get(handles.nBackInput,'string');
+    backRow = find(flavourColoum==0);
+    if strcmp(Nstr,'all')==1,
+        selectedData = [selectedData ; Data(backRow,:)];
+    else
+        N = uint16(str2double(Nstr));
+        selectedData = [selectedData ; Data(backRow(1:N),:)];
+    end
+end
+
+axes(handles.axesTableSelect); cla; 
+for i=1:length(selectedData(:,1)),
+    [Xr , Yr] = table2robot(selectedData(i,1),selectedData(i,2));
+    newPickTarget = [double(Xr) , double(Yr) , handles.zTable , ...
+                selectedData(i,3)];
+    handles.pickTarget = [handles.pickTarget ; newPickTarget];
+    set(handles.pickTargetList,'Data',handles.pickTarget);
+    set(handles.nPickTargetShow,'string',...
+         num2str(length(handles.pickTarget(:,1))));
+    hold on; 
+    set(handles.axesTableSelect,'color','none');
+    plotRectangle(selectedData(i,1) , selectedData(i,2),  -selectedData(i,3));
+    hold off;
+end
+catch
+    errordlg('Not Enough Chocolates');
+end
+guidata(hObject, handles);
+
 
 
 % --- Executes on slider movement.
@@ -1045,12 +1122,15 @@ guidata(hObject, handles);
 
 % --- Executes on slider movement.
 function placeTargetTheta_Callback(hObject, eventdata, handles)
-% hObject    handle to placeTargetTheta (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+newTheta = get(hObject,'Value');
+newTheta = newTheta*pi/180;
+handles.placeTarget(handles.selectedPlace,4) = newTheta;
+set(handles.placeTargetList,'Data',handles.placeTarget);
+handles.placeTable(handles.selectedPlace,3)=newTheta;
+axes(handles.placeTargetAxes); cla; hold on;
+set(handles.placeTargetAxes,'color','none');
+plotTarget(handles.placeTable); hold off;        
+guidata(hObject, handles);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -1078,4 +1158,10 @@ function pushbutton46_Callback(hObject, eventdata, handles)
 handles.placeTarget=[];
 set(handles.placeTargetList,'Data',handles.placeTarget);
 set(handles.nPlaceTargetShow,'string','0');
+guidata(hObject, handles);
+
+
+% --- Executes when selected cell(s) is changed in placeTargetList.
+function placeTargetList_CellSelectionCallback(hObject, eventdata, handles)
+handles.selectedPlace = eventdata.Indices(1);
 guidata(hObject, handles);
