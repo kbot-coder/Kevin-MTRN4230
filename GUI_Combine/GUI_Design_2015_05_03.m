@@ -70,6 +70,11 @@ handles.box  ={};
 handles.b    = [];
 handles.bSelect = [0 0]; %[box, region]
 
+handles.pickTarget = [];
+handles.placeTarget = [];
+handles.selectedChocolate = [];
+handles.zTable = 150;
+
 % Managing proper ties of Axis handles for showing the video & image
 % processing result
 % axes3 for showing detected choclate
@@ -86,17 +91,12 @@ set(handles.axesConvDetect, 'Xlim', [0,640], 'YLim', [0 480]);
 set(handles.axesTableSelect,'Xlim', [0,1600], 'YLim', [0 900]);
 
 
-% axes(handles.axesConvDetect);
-% imshow(imread('converyor.jpg'));
-% axes(handles.axes3);
-% imshow(imrot90(imread('empty.png'),2));
-% set(handles.axesConvCam,'Visible','off');
-% set(handles.TableCam,'Visible','off');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 axes(handles.axesConnectivity);
 load('conn.mat');   % the image of connectivity
 imshow(imDisconnect);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %Managing handles timer
 handles.timer= timer(...
     'ExecutionMode', 'fixedRate', ...               % Run timer repeatedly in fix rate
@@ -292,11 +292,19 @@ axes(handles.axesTableSelect); cla;
 set(handles.axesTableSelect,'color','none');
 try
     plotRectangle(selectedData(1,1) , selectedData(1,2),  -selectedData(1,3))
-    handles.chocolatesStr = strcat('<html><body bgcolor="#FFFFFF" text="#000000" width="100px">', ...
-            handles.chocolatesStr,'</span></html>');
+    handles.chocolatesStr =reshape(strtrim(cellstr(num2str(handles.chocolates(:)))),...
+        size(handles.chocolates));
     handles.chocolatesStr(Row,:) = strcat('<html><body bgcolor="#0000FF" text="#FFFFFF" width="100px">', ...
             handles.chocolatesStr(Row,:),'</span></html>');
     set(handles.ChocTable,'Data',handles.chocolatesStr);
+    
+    [Xr , Yr] = table2robot(selectedData(1,1),selectedData(1,2));
+    newPickTarget = [double(Xr) , double(Yr) , handles.zTable , ...
+        selectedData(1,3)];
+    handles.pickTarget = [handles.pickTarget ; newPickTarget];
+    set(handles.pickTargetList,'Data',handles.pickTarget);
+    set(handles.nPickTargetShow,'string',...
+        num2str(length(handles.pickTarget(:,1))));
 catch
     errordlg('No chocolate detected on that particular area');
 end
@@ -464,17 +472,13 @@ end
 
 % --- Executes on button press in pushbutton38.
 function pushbutton38_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton38 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-% Capture table camera, process it, detect choclate, & show it in axes 3
 %imgTable=getsnapshot(handles.vid1);     % capture image from video 1 (Table camera)
 imgTable=imread('IMG_013.jpg');
 axes(handles.TableCam);
 image(imgTable);
 set(handles.TableCam,'xtick',[],'ytick',[]);       % Supress the axes3 axis value
 
-axes(handles.axes3);
+axes(handles.axes3);cla;
 set(handles.axes3,'color','none');
 c = findChoc((imgTable));   % HERE THE CHOC DETECTION
 set(handles.axes3,'xtick',[],'ytick',[]);       % Supress the axes3 axis value
@@ -483,7 +487,6 @@ handles.chocolates =c(:,[1:3 6 8]);
 handles.chocolatesStr =reshape(strtrim(cellstr(num2str(handles.chocolates(:)))),...
         size(handles.chocolates));
 set(handles.ChocTable,'Data',handles.chocolatesStr); % show data chocolate on the table 
-
 set(handles.editCommand,'string','Done Detection');
 guidata(hObject, handles);
 
@@ -606,15 +609,16 @@ end
 function ChocTable_CellSelectionCallback(hObject, eventdata, handles)
 try
 handles.selectedRow = eventdata.Indices(1);
-selectedData = handles.chocolates(handles.selectedRow,:);
-handles.chocolatesStr = strcat('<html><body bgcolor="#FFFFFF" text="#000000" width="100px">', ...
-            handles.chocolatesStr,'</span></html>');
+handles.selectedChocolate = handles.chocolates(handles.selectedRow,:);
+handles.chocolatesStr =reshape(strtrim(cellstr(num2str(handles.chocolates(:)))),...
+        size(handles.chocolates));
 handles.chocolatesStr(handles.selectedRow,:) = strcat('<html><body bgcolor="#0000FF" text="#FFFFFF" width="100px">', ...
             handles.chocolatesStr(handles.selectedRow,:),'</span></html>');
 set(handles.ChocTable,'Data',handles.chocolatesStr);
 axes(handles.axesTableSelect); cla;
 set(handles.axesTableSelect,'color','none');
-plotRectangle(selectedData(1,1) , selectedData(1,2),  -selectedData(1,3))
+plotRectangle(handles.selectedChocolate(1,1) , ...
+    handles.selectedChocolate(1,2),  -handles.selectedChocolate(1,3));
 catch
 end
 guidata(hObject, handles);
@@ -1004,9 +1008,14 @@ end
 
 % --- Executes on button press in pushbutton44.
 function pushbutton44_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton44 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+[Xr , Yr] = table2robot(handles.selectedChocolate(1),handles.selectedChocolate(2));
+newPickTarget = [double(Xr) , double(Yr) , handles.zTable , ...
+    handles.selectedChocolate(3)];
+handles.pickTarget = [handles.pickTarget ; newPickTarget];
+set(handles.pickTargetList,'Data',handles.pickTarget);
+set(handles.nPickTargetShow,'string',num2str(length(handles.pickTarget(:,1))));
+guidata(hObject, handles);
+
 
 
 % --- Executes on slider movement.
@@ -1029,3 +1038,18 @@ function slider27_CreateFcn(hObject, eventdata, handles)
 if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor',[.9 .9 .9]);
 end
+
+
+% --- Executes on button press in pushbutton45.
+function pushbutton45_Callback(hObject, eventdata, handles)
+handles.pickTarget=[];
+set(handles.pickTargetList,'Data',handles.pickTarget);
+set(handles.nPickTargetShow,'string','0');
+guidata(hObject, handles);
+
+
+% --- Executes on button press in pushbutton46.
+function pushbutton46_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton46 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
