@@ -35,11 +35,13 @@ fprintf('receive\n')
 fclose(socket);
 fprintf('close\n')
 %ensure that the special code are received
-if strcmp(c,'HERE') == 1
+if strcmp(c,'REDE') == 1
     
     c = 'GREEN';
-else
+elseif strcmp(c,'BUSY') == 1
+    c= 'YELLOW';
     
+else
     c='RED';
 end
 

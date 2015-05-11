@@ -4,7 +4,7 @@ function cond = robBIND
     c= '';
     
     c=sender('KNOK');
-    c
+    
     %if succesfully send open receive
     pause(0.001);
     if strcmp(c,'GREEN') == 1
@@ -13,11 +13,13 @@ function cond = robBIND
     else
         c= 'RED';
     end
-    c
+    
     
     if strcmp(c,'GREEN')== 1 
         cond = 'GREEN';
    
+    elseif strcmp(c,'YELLOW')==1
+        cond = 'YELLOW';
     else
         cond = 'RED';
         errordlg('DISCONNECTED');
