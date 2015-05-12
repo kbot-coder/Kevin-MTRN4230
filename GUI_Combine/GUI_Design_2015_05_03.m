@@ -518,13 +518,12 @@ set(handles.ChocTable,'Data',handles.chocolatesStr); % show data chocolate on th
 set(handles.editCommand,'string','Done Detection');
 guidata(hObject, handles);
 
-
-
 % --- Executes on button press in runButton.
 function runButton_Callback(hObject, eventdata, handles)
-% hObject    handle to runButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+pickTarget = get(handles.pickTargetList,'Data');
+placeTarget = get(handles.placeTargetList,'Data');
+runRobot(pickTarget,placeTarget);
+
 
 function figure1_WindowKeyPressFcn(hObject, eventdata, handles)
 
