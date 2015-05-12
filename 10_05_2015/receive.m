@@ -16,29 +16,25 @@ robot_port = 1027;
 
 socket = tcpip(robot_IP_address, robot_port);
 set(socket, 'ReadAsyncMode', 'continuous');
-fprintf('bopen\n')
+
 fopen(socket);
-fprintf('aopen\n')
+
 % Check if the connection is valid.
 if(~isequal(get(socket, 'Status'), 'open'))
     warning(['Could not open TCP connection A=to ', robot_IP_address, ' on port ', robot_port]);
     return;
 end
-fprintf('waiting\n')
+
 %request special string
 
-c = fread(socket,4);
-c = (char(c)');
-c
-fprintf('receive\n')
+c1 = char(fread(socket,4))';
 
 fclose(socket);
-fprintf('close\n')
 %ensure that the special code are received
-if strcmp(c,'REDE') == 1
+if strcmp(c1,'REDE') == 1
     
     c = 'GREEN';
-elseif strcmp(c,'BUSY') == 1
+elseif strcmp(c1,'BUSY') == 1
     c= 'YELLOW';
     
 else

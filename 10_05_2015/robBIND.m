@@ -8,7 +8,7 @@ function cond = robBIND
     %if succesfully send open receive
     pause(0.001);
     if strcmp(c,'GREEN') == 1
-        fprintf('gagaga\n')
+        
         c = receive();
     else
         c= 'RED';

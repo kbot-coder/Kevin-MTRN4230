@@ -30,5 +30,7 @@ function [c,pos_theta] = TOrobot(pos_x_int,pos_y_int,pos_z_int,thetaX_int,thetaY
         c= 'GREEN';
         pos_theta = strcat('[',pos_x_str,',',pos_y_str,',',pos_z_str,',',num2str(quat_int(1)),',',num2str(quat_int(2)),',',num2str(quat_int(3)),',',...
         num2str(quat_int(4)),']');
+    else
+        c='RED';
     end
 end
