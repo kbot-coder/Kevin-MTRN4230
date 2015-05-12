@@ -75,6 +75,7 @@ handles.placeTarget = [];
 handles.selectedChocolate = [];
 handles.zTable = 150;
 handles.placeTable = [];
+handles.robotStatus = 'GREEN';
 
 % Managing proper ties of Axis handles for showing the video & image
 % processing result
@@ -322,6 +323,16 @@ switch get(get(handles.singleSelection,'SelectedObject'),'Tag')
         newPlaceTarget = [double(Xr) , double(Yr) , handles.zTable , ...
                 theta];
         newPlaceTable = [xx , yy , theta] ;
+%         
+%         if ~isempty(handles.placeTarget(:,:))        
+%             len = length( find((handles.placeTarget(:,1)>newPlaceTarget(1,1)-10) && ...
+%                     (handles.placeTarget(:,1)<newPlaceTarget(1,1)+10)) && ...
+%                     (handles.placeTarget(:,2)>newPlaceTarget(1,2)-10) && ...
+%                     (handles.placeTarget(:,2)<newPlaceTarget(1,2)+10) );    
+% 
+%             handles.zTable= handles.zTable+ 6*(len);
+%         end
+%         
         handles.placeTable = [handles.placeTable ; newPlaceTable];
         handles.placeTarget = [handles.placeTarget ; newPlaceTarget];
         set(handles.placeTargetList,'Data',handles.placeTarget);
@@ -404,8 +415,12 @@ function ChocTable1_CreateFcn(hObject, eventdata, handles)
 %--------------------------------------------------------------------------
 
 function UpdateConnection(hObject,eventdata,hfigure,handles)
-disp('Ping Robot');
-%guidata(hObject, handles);
+try
+    handles.robotStatus = robBIND;
+catch
+    errordlgerrordlgerrordlg
+end
+guidata(hObject, handles);
 
 
 
@@ -500,11 +515,11 @@ end
 
 % --- Executes on button press in pushbutton38.
 function pushbutton38_Callback(hObject, eventdata, handles)
-%imgTable=getsnapshot(handles.vid1);     % capture image from video 1 (Table camera)
-imgTable=imread('IMG_013.jpg');
-axes(handles.TableCam);
-image(imgTable);
-set(handles.TableCam,'xtick',[],'ytick',[]);       % Supress the axes3 axis value
+imgTable=getsnapshot(handles.vid1);     % capture image from video 1 (Table camera)
+% imgTable=imread('IMG_013.jpg');
+%axes(handles.TableCam);
+%image(imgTable);
+%set(handles.TableCam,'xtick',[],'ytick',[]);       % Supress the axes3 axis value
 
 axes(handles.axes3);cla;
 set(handles.axes3,'color','none');
@@ -522,7 +537,8 @@ guidata(hObject, handles);
 function runButton_Callback(hObject, eventdata, handles)
 pickTarget = get(handles.pickTargetList,'Data');
 placeTarget = get(handles.placeTargetList,'Data');
-runRobot(pickTarget,placeTarget);
+
+Torobot(pickTarget(1),pickTarget(2),pickTarget(3),0,0,pickTarget(4));
 
 
 function figure1_WindowKeyPressFcn(hObject, eventdata, handles)
@@ -1164,3 +1180,17 @@ guidata(hObject, handles);
 function placeTargetList_CellSelectionCallback(hObject, eventdata, handles)
 handles.selectedPlace = eventdata.Indices(1);
 guidata(hObject, handles);
+
+
+% --- Executes on button press in pushbutton48.
+function pushbutton48_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton48 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in pushbutton49.
+function pushbutton49_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton49 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
