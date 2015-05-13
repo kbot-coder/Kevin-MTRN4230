@@ -224,8 +224,8 @@ set(handles.editCommand,'string', 'Press ENTER to cancel' );
 [X, Y]=ginput(1);                                   % Get input coordinate from the table camera frame
 XR=900-Y; YR=X; XR=XR*1.5; YR=YR*1.5;               % Convert & adjust the measurement from pixle to mm
 XR=int32(XR); YR=int32(YR);                         % Convert X & Y value into integer
-texboxStatus = sprintf('X = %d  Y = %d', XR, YR);   % Set data to be showed
-set(handles.C_Coordinate,'String',texboxStatus);    % Show value into textbox
+% texboxStatus = sprintf('X = %d  Y = %d', XR, YR);   % Set data to be showed
+% set(handles.C_Coordinate,'String',texboxStatus);    % Show value into textbox
 % sender('0');                                        % Call sender function to send '0' as linear mode
 % pause(0.01);
 % data=sprintf('[%d,%d,150]',XR, YR);                 % Set data to be sended 
@@ -260,6 +260,12 @@ for choco = 1:siz(1,1);
                 ,[0 640],'ylim',[0 480]...
                   ,'Xtick',[], 'Ytick',[]);
             guidata(hObject, handles);
+            
+            % Set the Currently Selected coordinate 
+            X = handles.box{boxID}.xy(reg,1);
+            Y = handles.box{boxID}.xy(reg,2);
+            theta = handles.b(boxID,3);
+            set(handles.textCurrentSelect, 'string' , num2str([X Y theta]) );
             return;
         end
     end
@@ -277,6 +283,9 @@ set(handles.axesConvSelect,'color','none','Xlim'...
     ,[0 640],'ylim',[0 480]...
       ,'Xtick',[], 'Ytick',[]);
 
+% Set the Currently Selected coordinate . theta is left to be 0 for now  
+set(handles.textCurrentSelect, 'string' , num2str([X Y 0]) );
+  
 guidata(hObject, handles);
 
 
@@ -642,8 +651,18 @@ try
         handles.box{boxID}.rec{rowS}(2,:), '--k');
     set(handles.axesConvSelect, 'Xlim', [0,640], 'YLim', [0 480]...
         ,'color','none' ,'xtick',[],'ytick',[]);
+    
+    % Set the current coordinate textbox
+    X = handles.box{boxID}.xy(rowS,1);
+    Y = handles.box{boxID}.xy(rowS,2);
+    theta = handles.b(rowS,3);
+    set(handles.textCurrentSelect, 'string' , num2str([X Y theta]) );
+
+    
 catch
 end
+
+
 guidata(hObject, handles);
 
 % --- Executes on key release with focus on figure1 and none of its controls.
