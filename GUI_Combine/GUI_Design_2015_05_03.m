@@ -30,7 +30,8 @@ end
 function GUI_Design_2015_05_03_OpeningFcn(hObject, eventdata, handles, varargin)
 % Set All Handles Variable
 handles.output = hObject;
-
+clc;
+disp('------------   START   -----------');
 %--------Innitialize All Handles Variable That Will be Used----------------
 %VALUES
 handles.moving      = 0;                % Indicate the status of the robot in moving or not
@@ -435,9 +436,13 @@ drawnow();  % Push matlab to show the result before executing another function
 %--------------------------------------------------------------------------
 % --- Executes when user attempts to close figure1.
 function figure1_CloseRequestFcn(hObject, eventdata, handles)
+disp('------------END OF RUN------------');
 delete(hObject);
-delete(handles.vid1);   % Delete object input vodeo 1 before closing the GUI
-delete(handles.vid2);   % Delete object input vodeo 2 before closing the GUI
+try
+    delete(handles.vid1);   % Delete object input vodeo 1 before closing the GUI
+    delete(handles.vid2);   % Delete object input vodeo 2 before closing the GUI
+catch
+end
 delete(handles.timer1);  % Delete object timer before closing the GUI
 delete(handles.timer);  % Delete object timer before closing the GUI
 
