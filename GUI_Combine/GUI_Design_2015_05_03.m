@@ -515,11 +515,16 @@ end
 
 % --- Executes on button press in pushbutton38.
 function pushbutton38_Callback(hObject, eventdata, handles)
-imgTable=getsnapshot(handles.vid1);     % capture image from video 1 (Table camera)
-% imgTable=imread('IMG_013.jpg');
-%axes(handles.TableCam);
-%image(imgTable);
-%set(handles.TableCam,'xtick',[],'ytick',[]);       % Supress the axes3 axis value
+try 
+    imgTable=getsnapshot(handles.vid1);     % capture image from video 1 (Table camera)
+    set(handles.editCommand, 'string', 'Snaphot from Table Camera');
+catch
+    imgTable=imread('IMG_013.jpg');
+    set(handles.editCommand, 'string', 'Saved Image');
+end
+axes(handles.TableCam);
+image(imgTable);
+set(handles.TableCam,'xtick',[],'ytick',[]);       % Supress the axes3 axis value
 
 axes(handles.axes3);cla;
 set(handles.axes3,'color','none');
@@ -530,7 +535,7 @@ handles.chocolates =c(:,[1:3 6 8]);
 handles.chocolatesStr =reshape(strtrim(cellstr(num2str(handles.chocolates(:)))),...
         size(handles.chocolates));
 set(handles.ChocTable,'Data',handles.chocolatesStr); % show data chocolate on the table 
-set(handles.editCommand,'string','Done Detection');
+% set(handles.editCommand,'string','Done Detection');
 guidata(hObject, handles);
 
 % --- Executes on button press in runButton.
