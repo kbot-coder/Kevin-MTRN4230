@@ -32,6 +32,7 @@ function GUI_Design_2015_05_03_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 clc;
 disp('------------   START   -----------');
+
 %--------Innitialize All Handles Variable That Will be Used----------------
 %VALUES
 handles.moving      = 0;                % Indicate the status of the robot in moving or not
@@ -70,6 +71,9 @@ handles.CZ   = '0';     % Current end effector position on Z
 handles.box  ={};
 handles.b    = [];
 handles.bSelect = [0 0]; %[box, region]
+
+set(handles.pickTargetList,'data',[] );
+set(handles.placeTargetList,'data',[] );
 
 handles.pickTarget = [];
 handles.placeTarget = [];
@@ -222,70 +226,129 @@ sender(data);                                       % Call sender function to se
 function GetC_Coordinate_Callback(hObject, eventdata, handles)
 set(handles.editCommand,'string', 'Press ENTER to cancel' );
 [X, Y]=ginput(1);                                   % Get input coordinate from the table camera frame
-XR=900-Y; YR=X; XR=XR*1.5; YR=YR*1.5;               % Convert & adjust the measurement from pixle to mm
-XR=int32(XR); YR=int32(YR);                         % Convert X & Y value into integer
-% texboxStatus = sprintf('X = %d  Y = %d', XR, YR);   % Set data to be showed
-% set(handles.C_Coordinate,'String',texboxStatus);    % Show value into textbox
-% sender('0');                                        % Call sender function to send '0' as linear mode
-% pause(0.01);
-% data=sprintf('[%d,%d,150]',XR, YR);                 % Set data to be sended 
-% sender(data);                                       % Call sender function to send data
-% set ( handles.CmdStatus, 'String' ,...              % Show command in the command status
-%     ['Move End Efector Robot Linear to ' ] );
+ax = gca; 
 
-inside = 0;
-siz = size(handles.b);
-for choco = 1:siz(1,1);
-    for reg = 1:4 
-        inside = inpolygon( X,Y,...
-            handles.box{choco}.rec{reg}(1,:),...
-            handles.box{choco}.rec{reg}(2,:));
-        if inside ~= 0
-            set(handles.editCommand,'string',...
-                ['Yea Baby! it is inside '   num2str(choco) ] );
-            boxID = choco;
-            handles.bSelect = [boxID , reg];
-            
-            tempStr = data2str(handles.box{boxID}.xy,reg,0);
-            set(handles.uitableRegion, 'data', tempStr);
-            
-            tempStr = data2str(handles.b(:,3),boxID,0);
-            set(handles.uitableBox, 'data', tempStr);
-            
-             %plotting the rectangle 
-            axes(handles.axesConvSelect);
-            plot(handles.box{boxID}.rec{reg}(1,:),...
-                handles.box{boxID}.rec{reg}(2,:), '--k');
-            set(handles.axesConvSelect,'color','none','Xlim'...
-                ,[0 640],'ylim',[0 480]...
-                  ,'Xtick',[], 'Ytick',[]);
-            guidata(hObject, handles);
-            
-            % Set the Currently Selected coordinate 
-            X = handles.box{boxID}.xy(reg,1);
-            Y = handles.box{boxID}.xy(reg,2);
-            theta = handles.b(boxID,3);
-            set(handles.textCurrentSelect, 'string' , num2str([X Y theta]) );
-            return;
-        end
-    end
+switch ax
+    case handles.axesConvSelect
+        location = 0;
+    case handles.axesConvDetect
+        location = 0;
+    case handles.axesConvCam
+        location = 0;
+    case handles.placeTargetAxes
+        location = 1;
+    case handles.axesTableSelect
+        location = 1;
+    case handles.axes3 
+        location = 1;
+    case handles.TableCam
+        location = 1;
 end
 
-set(handles.uitableRegion, 'data', []);
 
-tempStr = data2str(handles.b(:,3),0,0);
-set(handles.uitableBox, 'data', tempStr);
+switch location
+% switch location % 0 = conveyer camera, 1 = table camera
+    case 0
+    XR=900-Y; YR=X; XR=XR*1.5; YR=YR*1.5;               % Convert & adjust the measurement from pixle to mm
+    XR=int32(XR); YR=int32(YR);                         % Convert X & Y value into integer
+    % texboxStatus = sprintf('X = %d  Y = %d', XR, YR);   % Set data to be showed
+    % set(handles.C_Coordinate,'String',texboxStatus);    % Show value into textbox
+    % sender('0');                                        % Call sender function to send '0' as linear mode
+    % pause(0.01);
+    % data=sprintf('[%d,%d,150]',XR, YR);                 % Set data to be sended 
+    % sender(data);                                       % Call sender function to send data
+    % set ( handles.CmdStatus, 'String' ,...              % Show command in the command status
+    %     ['Move End Efector Robot Linear to ' ] );
+    inside = 0;
+    siz = size(handles.b);
+    for choco = 1:siz(1,1);
+        for reg = 1:4 
+            inside = inpolygon( X,Y,...
+                handles.box{choco}.rec{reg}(1,:),...
+                handles.box{choco}.rec{reg}(2,:));
+            if inside ~= 0
+                set(handles.editCommand,'string',...
+                    ['Yea Baby! it is inside '   num2str(choco) ] );
+                boxID = choco;
+                handles.bSelect = [boxID , reg];
 
-set(handles.editCommand,'string','Not In Any Box' );
+                tempStr = data2str(handles.box{boxID}.xy,reg,0);
+                set(handles.uitableRegion, 'data', tempStr);
 
-axes(handles.axesConvSelect);cla;
-set(handles.axesConvSelect,'color','none','Xlim'...
-    ,[0 640],'ylim',[0 480]...
-      ,'Xtick',[], 'Ytick',[]);
+                tempStr = data2str(handles.b(:,3),boxID,0);
+                set(handles.uitableBox, 'data', tempStr);
 
-% Set the Currently Selected coordinate . theta is left to be 0 for now  
-set(handles.textCurrentSelect, 'string' , num2str([X Y 0]) );
-  
+                 %plotting the rectangle 
+                axes(handles.axesConvSelect);
+                plot(handles.box{boxID}.rec{reg}(1,:),...
+                    handles.box{boxID}.rec{reg}(2,:), '--k');
+                set(handles.axesConvSelect,'color','none','Xlim'...
+                    ,[0 640],'ylim',[0 480]...
+                      ,'Xtick',[], 'Ytick',[]);
+                guidata(hObject, handles);
+
+                % Set the Currently Selected coordinate 
+                X = handles.box{boxID}.xy(reg,1);
+                Y = handles.box{boxID}.xy(reg,2);
+                theta = handles.b(boxID,3);
+                set(handles.textCurrentSelect, 'string' , num2str([X Y theta]) );
+                return;
+            end
+        end
+    end
+
+    set(handles.uitableRegion, 'data', []);
+
+    tempStr = data2str(handles.b(:,3),0,0);
+    set(handles.uitableBox, 'data', tempStr);
+
+    set(handles.editCommand,'string','Not In Any Box' );
+
+    axes(handles.axesConvSelect);cla;
+    set(handles.axesConvSelect,'color','none','Xlim'...
+        ,[0 640],'ylim',[0 480]...
+          ,'Xtick',[], 'Ytick',[]);
+
+    % Set the Currently Selected coordinate . theta is left to be 0 for now  
+    set(handles.textCurrentSelect, 'string' , num2str([X Y 0]) );
+%% Case Table axes
+    case 1
+    xx = X;
+    yy = Y;
+
+    Data = handles.chocolates;
+    dataSize = size(Data);
+    selectedData = [];
+    Row = [];
+    for i=1:dataSize(1),
+        in = checkPoint(xx , yy , Data(i,1) , Data(i,2),  -Data(i,3));
+        if in == 1,
+            selectedData = Data(i,:);
+            Row = [Row,i];
+        end
+    end;
+    axes(handles.axesTableSelect); cla; 
+    set(handles.axesTableSelect,'color','none');
+    try
+        plotRectangle(selectedData(1,1) , selectedData(1,2),  -selectedData(1,3))
+        handles.chocolatesStr =reshape(strtrim(cellstr(num2str(handles.chocolates(:)))),...
+            size(handles.chocolates));
+        handles.chocolatesStr(Row,:) = strcat('<html><body bgcolor="#0000FF" text="#FFFFFF" width="100px">', ...
+                handles.chocolatesStr(Row,:),'</span></html>');
+        set(handles.ChocTable,'Data',handles.chocolatesStr);
+
+        [Xr , Yr] = table2robot(selectedData(1,1),selectedData(1,2));
+        newPickTarget = [double(Xr) , double(Yr) , handles.zTable , ...
+            selectedData(1,3)];
+        handles.pickTarget = [handles.pickTarget ; newPickTarget];
+        set(handles.pickTargetList,'Data',handles.pickTarget);
+        set(handles.nPickTargetShow,'string',...
+            num2str(length(handles.pickTarget(:,1))));
+    catch
+        errordlg('No chocolate detected on that particular area');
+    end
+end
+%%
 guidata(hObject, handles);
 
 
@@ -691,6 +754,10 @@ axes(handles.axesTableSelect); cla;
 set(handles.axesTableSelect,'color','none');
 plotRectangle(handles.selectedChocolate(1,1) , ...
     handles.selectedChocolate(1,2),  -handles.selectedChocolate(1,3));
+X = handles.chocolates(handles.selectedRow,1);
+Y = handles.chocolates(handles.selectedRow,2);
+theta = handles.chocolates(handles.selectedRow,3);
+set(handles.textCurrentSelect,'string',num2str([X Y theta]));
 catch
 end
 guidata(hObject, handles);
@@ -1227,13 +1294,33 @@ function pushbutton49_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in pushbuttonSetPICK.
 function pushbuttonSetPICK_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbuttonSetPICK (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+
+newPick = str2num(get(handles.textCurrentSelect,'string'));
+oldPick = get(handles.pickTargetList,'data');
+set(handles.pickTargetList,'data',oldPick );
+oldPick(end+1,:) = newPick;
+
+set(handles.pickTargetList,'data',oldPick );
+
 
 
 % --- Executes on button press in pushbuttonSetPLACE.
 function pushbuttonSetPLACE_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbuttonSetPLACE (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+
+newPick = str2num(get(handles.textCurrentSelect,'string'));
+oldPick = get(handles.placeTargetList,'data');
+set(handles.placeTargetList,'data',oldPick );
+oldPick(end+1,:) = newPick;
+
+set(handles.placeTargetList,'data',oldPick );
+
+
+% --- Keyboard shortcuts
+function figure1_KeyPressFcn(hObject, eventdata, handles)
+keyB = eventdata.Key; % Let's display the key, for fun!
+switch keyB
+    case '1'
+        pushbuttonSetPICK_Callback(hObject, eventdata, handles);
+    case '2'
+        pushbuttonSetPLACE_Callback(hObject, eventdata, handles);
+end
