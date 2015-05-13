@@ -1204,3 +1204,17 @@ function pushbutton49_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton49 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in pushbuttonSetPICK.
+function pushbuttonSetPICK_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbuttonSetPICK (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in pushbuttonSetPLACE.
+function pushbuttonSetPLACE_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbuttonSetPLACE (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
