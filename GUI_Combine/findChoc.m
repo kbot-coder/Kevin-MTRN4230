@@ -1,10 +1,19 @@
+%% Group 10 - The Power Rangers                                 
+% This is a function to detect the chocolates status 
+% [X Y orientation width length flavour 'up or down' pickability reachability]
+% 
+% Original version was created for assignment 1 MTRN4230
+% Senior GUI Engineers, The Power Ranger, UNSW
+% 
+%% Load reference image
 function c = findChoc(chocImage)
     hold on;
     c   = [];
     found   = 0;
-    % Load all files containing the variables
+    %% Load all files containing the variables
     load('referencImages.mat'); 
 
+    %% Image processing    
     img.image.rgb   = chocImage; 
     img.image.clean= img.image.rgb;
     img.image.clean(1:81,:) = 255;  
@@ -13,11 +22,12 @@ function c = findChoc(chocImage)
     temp = size(img.image.gray);
     img.res = temp(1:2);
     
-    %SURF features of the image
+    %% Compute surf features of the image
     img.SURFd   = detectSURFFeatures( img.image.gray, 'MetricThreshold', 200);
     [img.SURFf, img.SURFp]   = extractFeatures( img.image.gray, img.SURFd);    
     
-    % references from one flavour to another
+    %% Comparing the features of the image with the features of the 
+    %   reference images
     for flavi = 1:5
         tempStruct = refChoc{flavi};
         for refi = 1:tempStruct.N
