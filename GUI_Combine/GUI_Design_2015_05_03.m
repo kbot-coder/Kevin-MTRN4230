@@ -290,8 +290,10 @@ switch location
                 % Set the Currently Selected coordinate 
                 X = handles.box{boxID}.xy(reg,1);
                 Y = handles.box{boxID}.xy(reg,2);
+                [X,Y] = conveyor2robot(X,Y);
                 theta = handles.b(boxID,3);
-                set(handles.textCurrentSelect, 'string' , num2str([X Y theta]) );
+                set(handles.textCurrentSelect, 'string' ...
+                    , num2str([X Y theta]) );
                 return;
             end
         end
@@ -309,7 +311,8 @@ switch location
         ,[0 640],'ylim',[0 480]...
           ,'Xtick',[], 'Ytick',[]);
 
-    % Set the Currently Selected coordinate . theta is left to be 0 for now  
+    % Set the Currently Selected coordinate . theta is left to be 0 for now 
+    [X,Y] = conveyor2robot(X,Y);
     set(handles.textCurrentSelect, 'string' , num2str([X Y 0]) );
 %% Case Table axes
     case 1
@@ -325,6 +328,14 @@ switch location
         if in == 1,
             selectedData = Data(i,:);
             Row = [Row,i];
+            tempX = Data(i,1);
+            tempY = Data(i,2);
+            tempT = Data(i,3);
+            [tempX, tempY] = table2robot(tempX,tempY);
+            % show in the 'Currently Selected'
+            set(handles.textCurrentSelect, 'string' ,...
+                num2str([tempX tempY tempT]) );
+            break;
         end
     end;
     axes(handles.axesTableSelect); cla; 
@@ -337,15 +348,10 @@ switch location
                 handles.chocolatesStr(Row,:),'</span></html>');
         set(handles.ChocTable,'Data',handles.chocolatesStr);
 
-        [Xr , Yr] = table2robot(selectedData(1,1),selectedData(1,2));
-        newPickTarget = [double(Xr) , double(Yr) , handles.zTable , ...
-            selectedData(1,3)];
-        handles.pickTarget = [handles.pickTarget ; newPickTarget];
-        set(handles.pickTargetList,'Data',handles.pickTarget);
-        set(handles.nPickTargetShow,'string',...
-            num2str(length(handles.pickTarget(:,1))));
     catch
-        errordlg('No chocolate detected on that particular area');
+        set(handles.editCommand,'string','TABLE : Not In Any Box' );
+        [X, Y] = table2robot(X, Y);
+        set(handles.textCurrentSelect, 'string' , num2str([X Y 0]) );
     end
 end
 %%
@@ -662,8 +668,11 @@ end
 
 % --- Executes on button press in pushbuttonDetectBox.
 function pushbuttonDetectBox_Callback(hObject, eventdata, handles)
-%imgConv=getsnapshot(handles.vid2);      % capture image from video 2 (conveyor camera)
-imgConv=imread('converyor4.jpg');
+try
+    imgConv=getsnapshot(handles.vid2);      % capture image from video 2 (conveyor camera)
+catch
+    imgConv=imread('converyor4.jpg');
+end
 axes(handles.axesConvCam);
 image(imgConv);
 set(handles.axesConvCam,'xtick',[],'ytick',[]);
@@ -719,6 +728,7 @@ try
     X = handles.box{boxID}.xy(rowS,1);
     Y = handles.box{boxID}.xy(rowS,2);
     theta = handles.b(rowS,3);
+    [X, Y] = conveyor2robot(X,Y);
     set(handles.textCurrentSelect, 'string' , num2str([X Y theta]) );
 
     
@@ -1128,6 +1138,8 @@ if get(handles.selectMilk,'value')==1,
     if strcmp(Nstr,'all')==1,
         milkRow = find(flavourColoum==1);
         selectedData = [selectedData ; Data(milkRow,:)];
+        
+        
     else
         N = uint16(str2double(Nstr));
         milkRow = find(flavourColoum==1);
@@ -1193,6 +1205,18 @@ end
 catch
     errordlg('Not Enough Chocolates');
 end
+
+% newPick = str2num(get(handles.textCurrentSelect,'string'));
+% oldPick = get(handles.pickTargetList,'data');
+% set(handles.pickTargetList,'data',oldPick );
+% oldPick(end+1,:) = newPick;
+% 
+% numPICK = num2str(str2num(handles.nPickTargetShow.String)+1);
+% handles.nPickTargetShow.String = numPICK;
+% 
+% set(handles.pickTargetList,'data',oldPick );
+
+
 guidata(hObject, handles);
 
 
@@ -1300,7 +1324,12 @@ oldPick = get(handles.pickTargetList,'data');
 set(handles.pickTargetList,'data',oldPick );
 oldPick(end+1,:) = newPick;
 
+numPICK = num2str(str2num(handles.nPickTargetShow.String)+1);
+handles.nPickTargetShow.String = numPICK;
+
 set(handles.pickTargetList,'data',oldPick );
+
+guidata(hObject, handles);
 
 
 
@@ -1312,7 +1341,12 @@ oldPick = get(handles.placeTargetList,'data');
 set(handles.placeTargetList,'data',oldPick );
 oldPick(end+1,:) = newPick;
 
+numPLACE = num2str(str2num(handles.nPlaceTargetShow.String)+1);
+handles.nPlaceTargetShow.String = numPLACE;
+
 set(handles.placeTargetList,'data',oldPick );
+
+guidata(hObject, handles);
 
 
 % --- Keyboard shortcuts
@@ -1323,4 +1357,6 @@ switch keyB
         pushbuttonSetPICK_Callback(hObject, eventdata, handles);
     case '2'
         pushbuttonSetPLACE_Callback(hObject, eventdata, handles);
+    case 'space'
+        GetC_Coordinate_Callback(hObject, eventdata, handles);
 end

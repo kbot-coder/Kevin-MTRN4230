@@ -1,0 +1,17 @@
+function [Xr,Yr] = conveyor2robot(Xt,Yt)
+
+rat = 0.55; %ratio robot coordinate to pixel coordinate
+
+% R = [0 1 ; 1 0];
+S = [rat ; rat];
+T = [-32 ; 0];
+
+TCoor = [640;480]-[Xt ; Yt];
+
+RCoor = rat.*(TCoor + T);
+Xr = int32(RCoor(1));
+Yr = int32(RCoor(2));
+
+return
+
+% [x y] = conveyor2robot(1,1)
