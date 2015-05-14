@@ -222,7 +222,7 @@ sender(data);                                       % Call sender function to se
 
 %--------------------------Click & GO Button-------------------------------
 
-% Executed when Click & GO button on Table camera pressed 
+% Executed when Click 2 Select button pressed 
 function GetC_Coordinate_Callback(hObject, eventdata, handles)
 set(handles.editCommand,'string', 'Press ENTER to cancel' );
 [X, Y]=ginput(1);                                   % Get input coordinate from the table camera frame
@@ -303,17 +303,16 @@ switch location
 
     tempStr = data2str(handles.b(:,3),0,0);
     set(handles.uitableBox, 'data', tempStr);
-
     set(handles.editCommand,'string','Not In Any Box' );
-
     axes(handles.axesConvSelect);cla;
     set(handles.axesConvSelect,'color','none','Xlim'...
         ,[0 640],'ylim',[0 480]...
           ,'Xtick',[], 'Ytick',[]);
-
+    
     % Set the Currently Selected coordinate . theta is left to be 0 for now 
     [X,Y] = conveyor2robot(X,Y);
-    set(handles.textCurrentSelect, 'string' , num2str([X Y 0]) );
+    the = get(handles.editThetaClick,'String');
+    set(handles.textCurrentSelect, 'string' , [num2str([X Y]) '   ' the ] );
 %% Case Table axes
     case 1
     xx = X;
@@ -351,7 +350,8 @@ switch location
     catch
         set(handles.editCommand,'string','TABLE : Not In Any Box' );
         [X, Y] = table2robot(X, Y);
-        set(handles.textCurrentSelect, 'string' , num2str([X Y 0]) );
+        the = get(handles.editThetaClick,'String');
+        set(handles.textCurrentSelect, 'string' , [num2str([X Y]) '   ' the ]);
     end
 end
 %%
@@ -439,7 +439,7 @@ if handles.Connect == 0,        % When it hasn't connected yet
     %Managing Video handles
     [handles.vid1,handles.vid2,videoConnect] = ConnectToCamera;
     if videoConnect==1,
-        set(handles.connectButton,'String', 'Disconnect'); % Turn the button into connect button
+        set(handles.connectButton,'String', 'Disconnect'); % Turn the button into disconnect button
         handles.Connect = 1;        % make the connection status = 1 ---> Connected
         showImage(hObject,handles)
     end              
@@ -1194,14 +1194,31 @@ for i=1:length(selectedData(:,1)),
     newPickTarget = [double(Xr) , double(Yr) , handles.zTable , ...
                 selectedData(i,3)];
     handles.pickTarget = [handles.pickTarget ; newPickTarget];
-    set(handles.pickTargetList,'Data',handles.pickTarget);
-    set(handles.nPickTargetShow,'string',...
-         num2str(length(handles.pickTarget(:,1))));
+    
+%     set(handles.pickTargetList,'Data',handles.pickTarget);
+%     set(handles.nPickTargetShow,'string',...
+%          num2str(length(handles.pickTarget(:,1))));
+
     hold on; 
     set(handles.axesTableSelect,'color','none');
     plotRectangle(selectedData(i,1) , selectedData(i,2),  -selectedData(i,3));
     hold off;
 end
+%% Added this section . NOTE RONI
+handles.pickTarget = [handles.pickTarget ; newPickTarget];
+disp(num2str(handles.pickTarget(1:end-1,:)));
+
+newPick = handles.pickTarget(1:end-1,:);
+oldPick = get(handles.pickTargetList,'data');
+oldPick(end+1,:) = newPick;
+
+set(handles.pickTargetList,'data',oldPick );
+numPICK = num2str(str2num(handles.nPickTargetShow.String)+1);
+handles.nPickTargetShow.String = numPICK;
+
+% set(handles.pickTargetList,'data',oldPick );
+
+handles.pickTarget=[];
 catch
     errordlg('Not Enough Chocolates');
 end
@@ -1359,4 +1376,91 @@ switch keyB
         pushbuttonSetPLACE_Callback(hObject, eventdata, handles);
     case 'space'
         GetC_Coordinate_Callback(hObject, eventdata, handles);
+end
+
+
+% --- Executes on slider movement.
+function sliderThetaClick_Callback(hObject, eventdata, handles)
+sliderValue = num2str( get(handles.sliderThetaClick,'Value') );
+set(handles.editThetaClick,'String', sliderValue);
+
+
+% --- Executes during object creation, after setting all properties.
+function sliderThetaClick_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to sliderThetaClick (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+
+function editThetaClick_Callback(hObject, eventdata, handles)
+textValue = str2num( get(handles.editThetaClick,'String') );
+if isempty(textValue) || length(textValue)~=1
+    textValue = 0;
+    set(handles.editThetaClick,'String', num2str(textValue));
+    set(handles.editCommand,'String','Please fill only a single numeric value');
+end
+if textValue<pi && textValue>-pi
+    set(handles.sliderThetaClick,'Value',textValue);
+elseif textValue>0
+    textValue = 3.141; 
+    set(handles.editThetaClick,'String', num2str(textValue));
+    set(handles.sliderThetaClick,'Value',textValue);
+elseif textValue<0
+    textValue = -3.141;
+    set(handles.editThetaClick,'String', num2str(textValue));
+    set(handles.sliderThetaClick,'Value',textValue);
+end
+
+set(Manual.listSaveButton,'enable','off');
+
+    
+    
+
+% --- Executes during object creation, after setting all properties.
+function editThetaClick_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editThetaClick (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function editCustom_Callback(hObject, eventdata, handles)
+textValue = str2num( get(handles.editCustom,'String') );
+thet = get(handles.editThetaClick,'String');
+if isempty(textValue) || length(textValue)~=2
+    textValue = [0  0];
+    set(handles.textCurrentSelect,'String', [num2str(textValue) '   ' thet]);
+    set(handles.editCustom,'String', [num2str(textValue) '   ' thet]);
+    set(handles.editCommand,'String', 'Please fill only a 1X2 numeric value');
+end
+set(handles.textCurrentSelect,'string', [num2str(textValue) '   ' thet]);
+
+
+
+
+
+
+
+% --- Executes during object creation, after setting all properties.
+function editCustom_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editCustom (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
 end
