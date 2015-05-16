@@ -48,7 +48,9 @@ function automation_part2(c)
         pause(0.5);
         robot_status_loop;
         pause(0.5);
-        if strcmp(status1,'RED') == 1 || strcmp(status2,'RED') == 1 || strcmp(status3,'RED') == 1 ||strcmp(status4,'RED') == 1
+       [status5,home_coor] = TOrobot(c1(1,1),c1(1,2),offset+50,0,0,c1(1,3));
+       pause(0.5);
+        if strcmp(status1,'RED') == 1 || strcmp(status2,'RED') == 1 || strcmp(status3,'RED') == 1 ||strcmp(status4,'RED') == 1||strcmp(status5,'RED') == 1
             errordlg('DC_status1-4');
             break;
         end
