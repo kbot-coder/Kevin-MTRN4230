@@ -45,7 +45,7 @@ elseif strcmp(s_mode,'DISPLAY')==1
     
 else
     
-    fprintf('ERROR\n');
+    fprintf(2,'ERROR\n');
 end
 
 
