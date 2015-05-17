@@ -1,6 +1,6 @@
 function c=box_counter(s_mode,type,pos_coor)
 persistent box;
-
+%this function count how many chocolate are in the box
 if strcmp(s_mode,'WRITE')==1
         box_num = str2num(type);
         box(box_num,1)= box(box_num,1)+1;
@@ -66,14 +66,22 @@ elseif strcmp(s_mode,'MAKE')==1
         
     end
     
-elseif strcmp(s_mode,'SET')==1
-    number_set = str2num(type);
-    pos_coor_int = str2num(pos_coor);
-    box(number_set,3) = pos_coor_int(1,1);
-    box(number_set,4) = pos_coor_int(1,2);
-    box(number_set,5) = pos_coor_int(1,3);
-    box(number_set,6) = pos_coor_int(1,4);
+elseif strcmp(s_mode,'SETBOX')==1
     
+        number_set = str2num(type);
+        pos_coor_int = str2num(pos_coor);
+        box(number_set,3) = pos_coor_int(1,1);
+        box(number_set,4) = pos_coor_int(1,2);
+        box(number_set,5) = pos_coor_int(1,3);
+        box(number_set,6) = pos_coor_int(1,4);
+   
+elseif strcmp(s_mode,'SETCHOC')
+        
+        number_set = str2num(type);
+        pos_coor_int = str2num(pos_coor);
+        box(number_set,1) = pos_coor_int(1,1);
+        box(number_set,2) = pos_coor_int(1,2);
+        
 elseif strcmp(s_mode,'DISPLAY')==1
     
     box
