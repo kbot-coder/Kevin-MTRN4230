@@ -103,9 +103,7 @@ set(handles.placeTargetAxes,'xtick',[],'ytick',[]);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 axes(handles.axesConnectivity);
-load('conn.mat');   % the image of connectivity
-imshow(imDisconnect);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%
 
 %Managing handles timer
 handles.timer= timer(...
@@ -118,6 +116,15 @@ handles.timer1= timer(...
     'ExecutionMode', 'fixedRate', ...               % Run timer repeatedly in fix rate
     'Period', 0.5, ...                              % Initial period is 0.1 sec.
     'TimerFcn', {@UpdateConnection,hObject,handles});  % Specify callback function that executed when timer iterated
+
+
+%% Timer that check the Steps Of Current Robot's Run & Run it
+handles.timerRunRobot= timer(...
+    'ExecutionMode', 'fixedRate', ...               
+    'Period', 0.5, ...                             
+    'TimerFcn', {@RunRobot,hObject,handles}); 
+
+
 
 % Update handles structure
 guidata(hObject, handles);
@@ -222,7 +229,7 @@ sender(data);                                       % Call sender function to se
 
 %--------------------------Click & GO Button-------------------------------
 
-% Executed when Click & GO button on Table camera pressed 
+% Executed when Click 2 Select button pressed 
 function GetC_Coordinate_Callback(hObject, eventdata, handles)
 set(handles.editCommand,'string', 'Press ENTER to cancel' );
 [X, Y]=ginput(1);                                   % Get input coordinate from the table camera frame
@@ -303,17 +310,16 @@ switch location
 
     tempStr = data2str(handles.b(:,3),0,0);
     set(handles.uitableBox, 'data', tempStr);
-
     set(handles.editCommand,'string','Not In Any Box' );
-
     axes(handles.axesConvSelect);cla;
     set(handles.axesConvSelect,'color','none','Xlim'...
         ,[0 640],'ylim',[0 480]...
           ,'Xtick',[], 'Ytick',[]);
-
+    
     % Set the Currently Selected coordinate . theta is left to be 0 for now 
     [X,Y] = conveyor2robot(X,Y);
-    set(handles.textCurrentSelect, 'string' , num2str([X Y 0]) );
+    the = get(handles.editThetaClick,'String');
+    set(handles.textCurrentSelect, 'string' , [num2str([X Y]) '   ' the ] );
 %% Case Table axes
     case 1
     xx = X;
@@ -351,7 +357,8 @@ switch location
     catch
         set(handles.editCommand,'string','TABLE : Not In Any Box' );
         [X, Y] = table2robot(X, Y);
-        set(handles.textCurrentSelect, 'string' , num2str([X Y 0]) );
+        the = get(handles.editThetaClick,'String');
+        set(handles.textCurrentSelect, 'string' , [num2str([X Y]) '   ' the ]);
     end
 end
 %%
@@ -439,7 +446,7 @@ if handles.Connect == 0,        % When it hasn't connected yet
     %Managing Video handles
     [handles.vid1,handles.vid2,videoConnect] = ConnectToCamera;
     if videoConnect==1,
-        set(handles.connectButton,'String', 'Disconnect'); % Turn the button into connect button
+        set(handles.connectButton,'String', 'Disconnect'); % Turn the button into disconnect button
         handles.Connect = 1;        % make the connection status = 1 ---> Connected
         showImage(hObject,handles)
     end              
@@ -494,11 +501,20 @@ function ChocTable1_CreateFcn(hObject, eventdata, handles)
 %--------------------------------------------------------------------------
 
 function UpdateConnection(hObject,eventdata,hfigure,handles)
-try
-    handles.robotStatus = robBIND;
-catch
-    errordlgerrordlgerrordlg
+% handles.robotStatus
+
+robStat = robBIND;
+set(handles.textConnection,'String',robStat);
+
+switch robStat
+    case 'RED'
+        set(handles.textConnection,'ForegroundColor',[1 0 0]);
+    case 'YELLOW'
+        set(handles.textConnection,'ForegroundColor',[1 1 0]);
+    case 'GREEN'
+        set(handles.textConnection,'ForegroundColor',[0 1 0]);
 end
+
 guidata(hObject, handles);
 
 
@@ -508,6 +524,61 @@ function DetectChocolates(hObject,eventdata,hfigure,handles)
 drawnow();  % Push matlab to show the result before executing another function
 %guidata(hObject, handles);
 
+
+function RunRobot(hObject,eventdata,hfigure,handles)
+% 'PICK ' : trying to Pick
+% 'PICK_' : Just finished Picked
+robStat = get(handles.textRobotStatus,'String');
+conn    = get(handles.textConnection,'String');
+stepNum = str2num(robStat(6:end));
+doing = robStat(1:5);
+
+switch conn
+    case'GREEN'
+        switch doing
+
+            case 'PICK '
+                TOio(0,0,0,0,300);
+                pause(0.5);
+                xyt = get(handles.pickTargetList,'data');
+                [ X, Y, Z, theta] = getZloc(xyt, stepNum);     
+                TOrobot(X, Y, Z, 0, 0, theta);                
+            case 'LOAD '
+                TOio(0,0,1,1,300);
+                pause(0.5);
+                xyt = get(handles.placeTargetList,'data');
+                [ X, Y, Z, theta] = getZloc(xyt, stepNum);     
+                TOrobot(X, Y, Z, 0, 0, theta);                
+
+            % robot: form being busy to Free(Yellow to Green)
+            case 'PICK_'
+                TOio(0,0,1,1,300);
+                pause(0.5);
+                xyt = get(handles.placeTargetList,'data');
+                [ X, Y, Z, theta] = getZloc(xyt, stepNum);     
+                TOrobot(X, Y, Z, 0, 0, theta);
+                robStat(1:5) = 'LOAD ';
+            case 'LOAD_'
+                stepNum = stepNum+1;
+                TOio(0,0,0,0,300);
+                pause(0.5);
+                xyt = get(handles.pickTargetList,'data');
+                try
+                    [ X, Y, Z, theta] = getZloc(xyt, stepNum);
+                    TOrobot(X, Y, Z, 0, 0, theta);
+                    robStat(1:5) = 'PICK ';
+                catch
+                    set(handles.editCommand,'String','Done Picks and Loads');
+                    set(handles.textRobotStatus,'String','STAND BY');
+                    return;
+                end
+                
+        end  
+    case 'YELLOW'
+        robStat(5)= '_';
+end
+robStat = [robStat(1:5) num2str(stepNum)];
+set(handles.textRobotStatus,'String',robStat);
 
 %--------------------------------------------------------------------------
 % Managing Close GUI
@@ -621,12 +692,41 @@ set(handles.ChocTable,'Data',handles.chocolatesStr); % show data chocolate on th
 % set(handles.editCommand,'string','Done Detection');
 guidata(hObject, handles);
 
-% --- Executes on button press in runButton.
+% --- Executes on button press in runButton. 
 function runButton_Callback(hObject, eventdata, handles)
-pickTarget = get(handles.pickTargetList,'Data');
-placeTarget = get(handles.placeTargetList,'Data');
-
-Torobot(pickTarget(1),pickTarget(2),pickTarget(3),0,0,pickTarget(4));
+% pickTarget = get(handles.pickTargetList,'Data');
+% placeTarget = get(handles.placeTargetList,'Data');
+% Torobot(pickTarget(1),pickTarget(2),pickTarget(3),0,0,pickTarget(4));
+switch get(handles.runButton,'String')
+    case 'RUN'
+        switch get(handles.textConnection,'string')
+            case 'GREEN'
+                start(handles.timerRunRobot);
+                set(handles.runButton,'String','PAUSE');
+                
+                stat = get(handles.textRobotStatus,'String');
+                if strcmp(stat,'STAND BY')
+                    TOio(0,0,1,0,300);
+                    set(handles.textRobotStatus,'String', 'PICK 1');
+                    
+                end
+                
+            case 'YELLOW'
+                set(handles.editCommand,'String','Robot is busy. Please Wait');
+            case 'RED'
+                set(handles.editCommand,'String','Please Connect to the Robot');
+                errordlg('Please connect the robot','NO CONNECTION');
+        end
+    case 'PAUSE'
+        set(handles.runButton,'String','RESUME');
+        set(handles.editCommand,'String','Press Esc to Cancel Task');
+        stop(handles.timerRunRobot);
+        stop_func;
+    case 'RESUME'
+        set(handles.runButton,'String','PAUSE');
+        start(handles.timerRunRobot);
+        resume_func;
+end
 
 
 function figure1_WindowKeyPressFcn(hObject, eventdata, handles)
@@ -1129,82 +1229,101 @@ end
 % --- Executes on button press in pushbutton41.
 function pushbutton41_Callback(hObject, eventdata, handles)
 
-try
-Data = handles.chocolates;
-flavourColoum = Data(:,4);
-selectedData = [];
-if get(handles.selectMilk,'value')==1,
-    Nstr = get(handles.nMilkInput,'string');
-    if strcmp(Nstr,'all')==1,
-        milkRow = find(flavourColoum==1);
-        selectedData = [selectedData ; Data(milkRow,:)];
+% try
+    Data = handles.chocolates;
+    flavourColoum = Data(:,4);
+    selectedData = [];
+    if get(handles.selectMilk,'value')==1,
+        Nstr = get(handles.nMilkInput,'string');
+        if strcmp(Nstr,'all')==1,
+            milkRow = find(flavourColoum==1);
+            selectedData = [selectedData ; Data(milkRow,:)];
+            
+            
+        else
+            N = uint16(str2double(Nstr));
+            milkRow = find(flavourColoum==1);
+            selectedData = [selectedData ; Data(milkRow(1:N),:)];
+        end
+    end
+    
+    if get(handles.selectDark,'value')==1,
+        Nstr = get(handles.nDarkInput,'string');
+        darkRow = find(flavourColoum==2);
+        if strcmp(Nstr,'all')==1,
+            selectedData = [selectedData ; Data(darkRow,:)];
+        else
+            N = uint16(str2double(Nstr));
+            selectedData = [selectedData ; Data(darkRow(1:N),:)];
+        end
+    end
+    if get(handles.selectOrange,'value')==1,
+        Nstr = get(handles.nOrangeInput,'string');
+        orangeRow = find(flavourColoum==3);
+        if strcmp(Nstr,'all')==1,
+            selectedData = [selectedData ; Data(orangeRow,:)];
+        else
+            N = uint16(str2double(Nstr));
+            selectedData = [selectedData ; Data(orangeRow(1:N),:)];
+        end
+    end
+    if get(handles.selectMint,'value')==1,
+        Nstr = get(handles.nMintInput,'string');
+        mintRow = find(flavourColoum==4);
+        if strcmp(Nstr,'all')==1,
+            selectedData = [selectedData ; Data(mintRow,:)];
+        else
+            N = uint16(str2double(Nstr));
+            selectedData = [selectedData ; Data(mintRow(1:N),:)];
+        end
+    end
+    if get(handles.selectBack,'value')==1,
+        Nstr = get(handles.nBackInput,'string');
+        backRow = find(flavourColoum==0);
+        if strcmp(Nstr,'all')==1,
+            selectedData = [selectedData ; Data(backRow,:)];
+        else
+            N = uint16(str2double(Nstr));
+            selectedData = [selectedData ; Data(backRow(1:N),:)];
+        end
+    end
+    
+    axes(handles.axesTableSelect); cla;
+    for i=1:length(selectedData(:,1)),
+        [Xr , Yr] = table2robot(selectedData(i,1),selectedData(i,2));
+        newPickTarget = [double(Xr) , double(Yr) , handles.zTable , ...
+            selectedData(i,3)];
+        handles.pickTarget = [handles.pickTarget ; newPickTarget];
         
+        %     set(handles.pickTargetList,'Data',handles.pickTarget);
+        %     set(handles.nPickTargetShow,'string',...
+        %          num2str(length(handles.pickTarget(:,1))));
         
-    else
-        N = uint16(str2double(Nstr));
-        milkRow = find(flavourColoum==1);
-        selectedData = [selectedData ; Data(milkRow(1:N),:)];
+        hold on;
+        set(handles.axesTableSelect,'color','none');
+        plotRectangle(selectedData(i,1) , selectedData(i,2),  -selectedData(i,3));
+        hold off;
     end
-end
-
-if get(handles.selectDark,'value')==1,
-    Nstr = get(handles.nDarkInput,'string');
-    darkRow = find(flavourColoum==2);
-    if strcmp(Nstr,'all')==1,
-        selectedData = [selectedData ; Data(darkRow,:)];
-    else
-        N = uint16(str2double(Nstr));
-        selectedData = [selectedData ; Data(darkRow(1:N),:)];
-    end
-end
-if get(handles.selectOrange,'value')==1,
-    Nstr = get(handles.nOrangeInput,'string');
-    orangeRow = find(flavourColoum==3);
-    if strcmp(Nstr,'all')==1,
-        selectedData = [selectedData ; Data(orangeRow,:)];
-    else
-        N = uint16(str2double(Nstr));
-        selectedData = [selectedData ; Data(orangeRow(1:N),:)];
-    end
-end
-if get(handles.selectMint,'value')==1,
-    Nstr = get(handles.nMintInput,'string');
-    mintRow = find(flavourColoum==4);
-    if strcmp(Nstr,'all')==1,
-        selectedData = [selectedData ; Data(mintRow,:)];
-    else
-        N = uint16(str2double(Nstr));
-        selectedData = [selectedData ; Data(mintRow(1:N),:)];
-    end
-end
-if get(handles.selectBack,'value')==1,
-    Nstr = get(handles.nBackInput,'string');
-    backRow = find(flavourColoum==0);
-    if strcmp(Nstr,'all')==1,
-        selectedData = [selectedData ; Data(backRow,:)];
-    else
-        N = uint16(str2double(Nstr));
-        selectedData = [selectedData ; Data(backRow(1:N),:)];
-    end
-end
-
-axes(handles.axesTableSelect); cla; 
-for i=1:length(selectedData(:,1)),
-    [Xr , Yr] = table2robot(selectedData(i,1),selectedData(i,2));
-    newPickTarget = [double(Xr) , double(Yr) , handles.zTable , ...
-                selectedData(i,3)];
+    %% Added this section . NOTE RONI
     handles.pickTarget = [handles.pickTarget ; newPickTarget];
-    set(handles.pickTargetList,'Data',handles.pickTarget);
-    set(handles.nPickTargetShow,'string',...
-         num2str(length(handles.pickTarget(:,1))));
-    hold on; 
-    set(handles.axesTableSelect,'color','none');
-    plotRectangle(selectedData(i,1) , selectedData(i,2),  -selectedData(i,3));
-    hold off;
-end
-catch
-    errordlg('Not Enough Chocolates');
-end
+    
+    newPick = handles.pickTarget(1:end-1,1:2);
+    newPick(:,3) = handles.pickTarget(1:end-1,4);
+    numb = size(newPick);
+    oldPick = get(handles.pickTargetList,'data');
+    oldPick = [oldPick;newPick];
+    
+    numPICK = num2str(str2num(handles.nPickTargetShow.String)+numb(1));
+    handles.nPickTargetShow.String = numPICK;
+    set(handles.pickTargetList,'data',oldPick );
+    
+    handles.pickTarget=[];
+    
+
+% catch
+%     errordlg('Not Enough Chocolates');
+% end
+
 
 % newPick = str2num(get(handles.textCurrentSelect,'string'));
 % oldPick = get(handles.pickTargetList,'data');
@@ -1325,7 +1444,7 @@ function pushbuttonSetPICK_Callback(hObject, eventdata, handles)
 newPick = str2num(get(handles.textCurrentSelect,'string'));
 oldPick = get(handles.pickTargetList,'data');
 set(handles.pickTargetList,'data',oldPick );
-oldPick(end+1,:) = newPick;
+oldPick = [oldPick;newPick];
 
 numPICK = num2str(str2num(handles.nPickTargetShow.String)+1);
 handles.nPickTargetShow.String = numPICK;
@@ -1342,7 +1461,7 @@ function pushbuttonSetPLACE_Callback(hObject, eventdata, handles)
 newPick = str2num(get(handles.textCurrentSelect,'string'));
 oldPick = get(handles.placeTargetList,'data');
 set(handles.placeTargetList,'data',oldPick );
-oldPick(end+1,:) = newPick;
+oldPick = [oldPick;newPick];
 
 numPLACE = num2str(str2num(handles.nPlaceTargetShow.String)+1);
 handles.nPlaceTargetShow.String = numPLACE;
@@ -1354,7 +1473,7 @@ guidata(hObject, handles);
 
 % --- Keyboard shortcuts
 function figure1_KeyPressFcn(hObject, eventdata, handles)
-keyB = eventdata.Key; % Let's display the key, for fun!
+keyB = eventdata.Key % Let's display the key, for fun!
 switch keyB
     case '1'
         pushbuttonSetPICK_Callback(hObject, eventdata, handles);
@@ -1362,6 +1481,104 @@ switch keyB
         pushbuttonSetPLACE_Callback(hObject, eventdata, handles);
     case 'space'
         GetC_Coordinate_Callback(hObject, eventdata, handles);
+%     case 't'
+    case 'escape'
+        switch get(handles.runButton,'String')
+            case 'RESUME'
+                set(handles.runButton,'String','RUN');
+                stop(handles.timerRunRobot);
+                cancel_func;
+                pause(0.6);
+                TOio(0,0,0,0,300);
+        end
+        
+end
+
+
+% --- Executes on slider movement.
+function sliderThetaClick_Callback(hObject, eventdata, handles)
+sliderValue = num2str( get(handles.sliderThetaClick,'Value') );
+set(handles.editThetaClick,'String', sliderValue);
+
+
+% --- Executes during object creation, after setting all properties.
+function sliderThetaClick_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to sliderThetaClick (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+
+function editThetaClick_Callback(hObject, eventdata, handles)
+textValue = str2num( get(handles.editThetaClick,'String') );
+if isempty(textValue) || length(textValue)~=1
+    textValue = 0;
+    set(handles.editThetaClick,'String', num2str(textValue));
+    set(handles.editCommand,'String','Please fill only a single numeric value');
+end
+if textValue<pi && textValue>-pi
+    set(handles.sliderThetaClick,'Value',textValue);
+elseif textValue>0
+    textValue = 3.141; 
+    set(handles.editThetaClick,'String', num2str(textValue));
+    set(handles.sliderThetaClick,'Value',textValue);
+elseif textValue<0
+    textValue = -3.141;
+    set(handles.editThetaClick,'String', num2str(textValue));
+    set(handles.sliderThetaClick,'Value',textValue);
+end
+
+set(Manual.listSaveButton,'enable','off');
+
+    
+    
+
+% --- Executes during object creation, after setting all properties.
+function editThetaClick_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editThetaClick (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function editCustom_Callback(hObject, eventdata, handles)
+textValue = str2num( get(handles.editCustom,'String') );
+thet = get(handles.editThetaClick,'String');
+if isempty(textValue) || length(textValue)~=2
+    textValue = [0  0];
+    set(handles.textCurrentSelect,'String', [num2str(textValue) '   ' thet]);
+    set(handles.editCustom,'String', [num2str(textValue) '   ' thet]);
+    set(handles.editCommand,'String', 'Please fill only a 1X2 numeric value');
+end
+set(handles.textCurrentSelect,'string', [num2str(textValue) '   ' thet]);
+
+
+
+
+
+
+
+% --- Executes during object creation, after setting all properties.
+function editCustom_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to editCustom (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
 end
 
 
