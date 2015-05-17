@@ -105,7 +105,7 @@ set(handles.placeTargetAxes,'xtick',[],'ytick',[]);
 axes(handles.axesConnectivity);
 %%%%%%%%%%%%%%%%%%%%
 
-%Managing handles timer
+%Managing handles TIMERS INITIALISATION
 handles.timer= timer(...
     'ExecutionMode', 'fixedRate', ...               % Run timer repeatedly in fix rate
     'Period', 5, ...                              % Initial period is 0.1 sec.
@@ -114,7 +114,7 @@ handles.timer= timer(...
 
 handles.timer1= timer(...
     'ExecutionMode', 'fixedRate', ...               % Run timer repeatedly in fix rate
-    'Period', 0.5, ...                              % Initial period is 0.1 sec.
+    'Period', 1, ...                              % Initial period is 0.1 sec.
     'TimerFcn', {@UpdateConnection,hObject,handles});  % Specify callback function that executed when timer iterated
 
 
@@ -232,9 +232,11 @@ sender(data);                                       % Call sender function to se
 % Executed when Click 2 Select button pressed 
 function GetC_Coordinate_Callback(hObject, eventdata, handles)
 set(handles.editCommand,'string', 'Press ENTER to cancel' );
+
 [X, Y]=ginput(1);                                   % Get input coordinate from the table camera frame
 ax = gca; 
-
+[pick]= reachable(X,Y);
+if pick==1
 switch ax
     case handles.axesConvSelect
         location = 0;
@@ -361,6 +363,10 @@ switch location
         set(handles.textCurrentSelect, 'string' , [num2str([X Y]) '   ' the ]);
     end
 end
+else 
+    errordlg('Unreachable Chocolate. Select again'); 
+end
+
 %%
 guidata(hObject, handles);
 
@@ -455,7 +461,7 @@ else                            % When it already connected
     stop(handles.timer1);        
     stop(handles.vid1);         % stop video 2 to disconnect from table camera
     stop(handles.vid2);         % stop video 2 to disconnect from conveyor camera
-    delete(handles.timer1);        % Stop timer to stop connection wit the robot
+    delete(handles.timer1);        % Stop  to stop connection wit the robot
     delete(handles.vid1);         % stop video 2 to disconnect from table camera
     delete(handles.vid2);
     handles.Connect = 0;        % make the connection status = 0 ---> unconnected
@@ -502,7 +508,6 @@ function ChocTable1_CreateFcn(hObject, eventdata, handles)
 
 function UpdateConnection(hObject,eventdata,hfigure,handles)
 % handles.robotStatus
-
 robStat = robBIND;
 set(handles.textConnection,'String',robStat);
 
@@ -515,7 +520,6 @@ switch robStat
         set(handles.textConnection,'ForegroundColor',[0 1 0]);
 end
 
-guidata(hObject, handles);
 
 
 
@@ -534,10 +538,10 @@ stepNum = str2num(robStat(6:end));
 doing = robStat(1:5);
 
 switch conn
-    case'GREEN'
+    case'GREEN'  
         switch doing
-
             case 'PICK '
+                disp('picking')
                 TOio(0,0,0,0,300);
                 pause(0.5);
                 xyt = get(handles.pickTargetList,'data');
@@ -549,7 +553,6 @@ switch conn
                 xyt = get(handles.placeTargetList,'data');
                 [ X, Y, Z, theta] = getZloc(xyt, stepNum);     
                 TOrobot(X, Y, Z, 0, 0, theta);                
-
             % robot: form being busy to Free(Yellow to Green)
             case 'PICK_'
                 TOio(0,0,1,1,300);
@@ -568,17 +571,20 @@ switch conn
                     TOrobot(X, Y, Z, 0, 0, theta);
                     robStat(1:5) = 'PICK ';
                 catch
-                    set(handles.editCommand,'String','Done Picks and Loads');
+                    set(handles.editCommand,'String','DONE Picks and Loads');
                     set(handles.textRobotStatus,'String','STAND BY');
+                    set(handles.runButton,'String','RUN');
+                    stop(handles.timerRunRobot);
                     return;
-                end
-                
+                end      
         end  
     case 'YELLOW'
         robStat(5)= '_';
 end
 robStat = [robStat(1:5) num2str(stepNum)];
 set(handles.textRobotStatus,'String',robStat);
+
+
 
 %--------------------------------------------------------------------------
 % Managing Close GUI
@@ -673,7 +679,7 @@ try
     imgTable=getsnapshot(handles.vid1);     % capture image from video 1 (Table camera)
     set(handles.editCommand, 'string', 'Snaphot from Table Camera');
 catch
-    imgTable=imread('IMG_013.jpg');
+    imgTable=imread('IMG_005.jpg');
     set(handles.editCommand, 'string', 'Saved Image');
 end
 axes(handles.TableCam);
@@ -705,17 +711,16 @@ switch get(handles.runButton,'String')
                 set(handles.runButton,'String','PAUSE');
                 
                 stat = get(handles.textRobotStatus,'String');
-                if strcmp(stat,'STAND BY')
+                if strcmp(stat(1:5),'STAND')
                     TOio(0,0,1,0,300);
                     set(handles.textRobotStatus,'String', 'PICK 1');
-                    
                 end
                 
             case 'YELLOW'
                 set(handles.editCommand,'String','Robot is busy. Please Wait');
             case 'RED'
                 set(handles.editCommand,'String','Please Connect to the Robot');
-                errordlg('Please connect the robot','NO CONNECTION');
+%                 errordlg('Please connect the robot','NO CONNECTION');
         end
     case 'PAUSE'
         set(handles.runButton,'String','RESUME');
@@ -767,6 +772,7 @@ end
 
 
 % --- Executes on button press in pushbuttonDetectBox.
+
 function pushbuttonDetectBox_Callback(hObject, eventdata, handles)
 try
     imgConv=getsnapshot(handles.vid2);      % capture image from video 2 (conveyor camera)
@@ -786,6 +792,7 @@ set(handles.axesConvDetect,'xtick',[],'ytick',[]);
 set(handles.uitableBox, 'data', handles.b(:,3));
 
 set(handles.editCommand, 'String', 'Done Boxes Detection');
+% assignin('base', 'handles', handles);
 guidata(hObject, handles);
 
 
@@ -807,6 +814,10 @@ guidata(hObject, handles);
 
 % --- Executes when selected cell(s) is changed in uitableRegion.
 function uitableRegion_CellSelectionCallback(hObject, eventdata, handles)
+% handles.b(:,3)    : x by 3. the x,y,theta of the box
+% handles.box{boxID}.xy : the 4 X,Y of each region
+% handles.box{boxID}.rec{rowS} : the 4 corners of each regions
+
 try    
     boxID = handles.bSelect(1,1);
     rowS = eventdata.Indices(1);
@@ -1402,17 +1413,14 @@ end
 % --- Executes on button press in pushbutton45.
 function pushbutton45_Callback(hObject, eventdata, handles)
 handles.pickTarget=[];
-handles.placeTarget=[];
 set(handles.pickTargetList,'Data',handles.pickTarget);
 set(handles.nPickTargetShow,'string','0');
-set(handles.placeTargetList,'Data',handles.placeTarget);
-set(handles.nPlaceTargetShow,'string','0');
 guidata(hObject, handles);
 
 
-% --- Executes on button press in deletePlaceData.
-function deletePlaceData_Callback(hObject, eventdata, handles)
-handles.placeTarget(handles.selectedPlace,:)=[];
+% --- Executes on button press in pushbutton46.
+function pushbutton46_Callback(hObject, eventdata, handles)
+handles.placeTarget=[];
 set(handles.placeTargetList,'Data',handles.placeTarget);
 set(handles.nPlaceTargetShow,'string','0');
 guidata(hObject, handles);
@@ -1441,15 +1449,20 @@ function pushbutton49_Callback(hObject, eventdata, handles)
 % --- Executes on button press in pushbuttonSetPICK.
 function pushbuttonSetPICK_Callback(hObject, eventdata, handles)
 
-newPick = str2num(get(handles.textCurrentSelect,'string'));
-oldPick = get(handles.pickTargetList,'data');
-set(handles.pickTargetList,'data',oldPick );
-oldPick = [oldPick;newPick];
+if handles.chocolates(:,5)==1
+    newPick = str2num(get(handles.textCurrentSelect,'string'));
+    oldPick = get(handles.pickTargetList,'data');
+    set(handles.pickTargetList,'data',oldPick );
+    oldPick = [oldPick;newPick];
 
-numPICK = num2str(str2num(handles.nPickTargetShow.String)+1);
-handles.nPickTargetShow.String = numPICK;
+    numPICK = num2str(str2num(handles.nPickTargetShow.String)+1);
+    handles.nPickTargetShow.String = numPICK;
 
-set(handles.pickTargetList,'data',oldPick );
+    set(handles.pickTargetList,'data',oldPick );
+    
+else 
+    errordlg('Unreachable Chocolate. Select again'); 
+end
 
 guidata(hObject, handles);
 
@@ -1457,6 +1470,7 @@ guidata(hObject, handles);
 
 % --- Executes on button press in pushbuttonSetPLACE.
 function pushbuttonSetPLACE_Callback(hObject, eventdata, handles)
+
 
 newPick = str2num(get(handles.textCurrentSelect,'string'));
 oldPick = get(handles.placeTargetList,'data');
@@ -1467,6 +1481,7 @@ numPLACE = num2str(str2num(handles.nPlaceTargetShow.String)+1);
 handles.nPlaceTargetShow.String = numPLACE;
 
 set(handles.placeTargetList,'data',oldPick );
+
 
 guidata(hObject, handles);
 
@@ -1582,45 +1597,220 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in addPlaceData.
-function addPlaceData_Callback(hObject, eventdata, handles)
-% hObject    handle to addPlaceData (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
+% --- Executes on button press in pushbutton55.
+function pushbutton55_Callback(hObject, eventdata, handles)
+% % % pushbuttonDetectBox_Callback(hObject, eventdata, handles);
+% % % pushbutton38_Callback(hObject, eventdata, handles);
+% % % % handles.b(1,3);
+% % % % handles.chocolates
+% % % % handles.box{1}.xy(1,1
+% % % try
+% % %     for i =1:100
+% % %         temp(:,1:3) = handles.chocolates(:,1:3);
+% % %         set(handles.pickTargetList,'string',num2str(temp));       
+% % %     end
+% % % catch
+% % % end
+try
+    imgConv=getsnapshot(handles.vid2);      % capture image from video 2 (conveyor camera)
+catch
+    imgConv=imread('converyor4.jpg');
+end
+axes(handles.axesConvCam);
+image(imgConv);
+set(handles.axesConvCam,'xtick',[],'ytick',[]);
+axes(handles.axesConvDetect);hold on;
+[handles.b ,handles.box]=plotBoxConv(imgConv); hold off; % detect box
+set(handles.axesConvDetect,'color','none'); 
+set(handles.axesConvDetect,'xtick',[],'ytick',[]);
+set(handles.uitableBox, 'data', handles.b(:,3));
+set(handles.editCommand, 'String', 'Done Boxes Detection');
+
+try 
+    imgTable=getsnapshot(handles.vid1);     % capture image from video 1 (Table camera)
+    set(handles.editCommand, 'string', 'Snaphot from Table Camera');
+catch
+    imgTable=imread('IMG_005.jpg');
+    set(handles.editCommand, 'string', 'Saved Image');
+end
+axes(handles.TableCam);
+image(imgTable);
+set(handles.TableCam,'xtick',[],'ytick',[]);       % Supress the axes3 axis value
+axes(handles.axes3);cla;
+set(handles.axes3,'color','none');
+c = findChoc((imgTable));   % HERE THE CHOC DETECTION
+handles.chocolates =c(:,[1:3 6 8]);
+[n,~]=size(c);
+
+%get box coordinate
+box=handles.b(1,3);
+handles.placeTarget = [handles.box{1}.xy(1,1),handles.box{1}.xy(1,2),box];
+% axes(handles.axesConvSelect);
+%  plot(handles.box{1}.rec{1}(1,:),...
+%         handles.box{1}.rec{1}(2,:), 'k');
+%     set(handles.axesConvSelect, 'Xlim', [0,640], 'YLim', [0 480]...
+%         ,'color','none' ,'xtick',[],'ytick',[]);
+%     
+for i=1:n %loop until detected chocolate
+if handles.chocolates(:,5)==1 %if reachable
+    %pick function
+    pushbuttonSetPICK_Callback(hObject, eventdata, handles)
+
+    %place function
+    pushbuttonSetPLACE_Callback(hObject, eventdata, handles)
+    %run fuction
+    runButton_Callback(hObject, eventdata, handles)
+end
+
+    if c(:,6)==0
+        %flip function
+    end
+    i=i+1;
+end
+
+
+
+% --- Executes when entered data in editable cell(s) in uitableBox.
+function uitableBox_CellEditCallback(hObject, eventdata, handles)
+% hObject    handle to uitableBox (see GCBO)
+% eventdata  structure with the following fields (see MATLAB.UI.CONTROL.TABLE)
+%	Indices: row and column indices of the cell(s) edited
+%	PreviousData: previous data for the cell(s) edited
+%	EditData: string(s) entered by the user
+%	NewData: EditData or its converted form set on the Data property. Empty if Data was not changed
+%	Error: error string when failed to convert EditData to appropriate value for Data
 % handles    structure with handles and user data (see GUIDATA)
-newData = handles.placeTarget(handles.selectedPlace,:);
-handles.placeTarget = [handles.placeTarget ; newData];
-set(handles.placeTargetList,'Data',handles.placeTarget);
-guidata(hObject, handles);
-    
 
 
-% --- Executes on button press in pushbutton56.
-function pushbutton56_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton56 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-handles.pickTarget(handles.selectedPick,:)=[];
-set(handles.pickTargetList,'Data',handles.pickTarget);
-%set(handles.nPickTargetShow,'string','0');
-guidata(hObject, handles);
-
-
-% --- Executes on button press in pushbutton57.
-function pushbutton57_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton57 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-newData = handles.pickTarget(handles.selectedPick,:);
-handles.pickTarget = [handles.pickTarget ; newData];
-set(handles.pickTargetList,'Data',handles.pickTarget);
-guidata(hObject, handles);
-
-
-% --- Executes when selected cell(s) is changed in pickTargetList.
-function pickTargetList_CellSelectionCallback(hObject, eventdata, handles)
+% --- Executes when entered data in editable cell(s) in pickTargetList.
+function pickTargetList_CellEditCallback(hObject, eventdata, handles)
 % hObject    handle to pickTargetList (see GCBO)
 % eventdata  structure with the following fields (see MATLAB.UI.CONTROL.TABLE)
-%	Indices: row and column indices of the cell(s) currently selecteds
+%	Indices: row and column indices of the cell(s) edited
+%	PreviousData: previous data for the cell(s) edited
+%	EditData: string(s) entered by the user
+%	NewData: EditData or its converted form set on the Data property. Empty if Data was not changed
+%	Error: error string when failed to convert EditData to appropriate value for Data
 % handles    structure with handles and user data (see GUIDATA)
-handles.selectedPick = eventdata.Indices(1);
+
+
+% --- Executes during object creation, after setting all properties.
+function placeTargetAxes_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to placeTargetAxes (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: place code in OpeningFcn to populate placeTargetAxes
+
+
+% --- Executes on selection change in autoMode.
+function autoMode_Callback(hObject, eventdata, handles)
+p = eventdata.Source.String(eventdata.Source.Value,:);
+% Set the mode onto the push button
+set(handles.pushbuttonAuto,'String',p);
+
+
+% --- Executes during object creation, after setting all properties.
+function autoMode_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to autoMode (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: listbox controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in pushbuttonAuto.
+function pushbuttonAuto_Callback(hObject, eventdata, handles)
+p = get(handles.pushbuttonAuto,'String');
+try
+    switch p{1}
+        case 'LOAD'
+            autoLoad(hObject, eventdata, handles)
+        case 'UNLOAD'
+            autoUnload(hObject, eventdata, handles)
+        case 'STACK'
+            autoStack(hObject, eventdata, handles)
+        case 'Choose'
+            set(handles.editCommand,'String','Please select a Mode');
+    end
+catch
+end
+set(handles.pushbuttonAuto,'String','Choose');
 guidata(hObject, handles);
+
+%% Auto Load Function
+function autoLoad(hObject, eventdata, handles)
+set(handles.editCommand,'String','AutoLoading'); drawnow;
+pushbutton38_Callback(hObject, eventdata, handles);
+
+% The number of pickables
+set(handles.pickTargetList,'data',handles.ChocTable.Data(:,1:3));
+Sc = size(handles.ChocTable.Data());
+
+set(handles.nPickTargetShow,'string',num2str(Sc(1,:)));
+pushbuttonAutoPlace_Callback(hObject, eventdata, handles);
+guidata(hObject, handles);
+
+
+
+
+
+
+
+
+% --- Executes on selection change in listboxPredefined.
+function listboxPredefined_Callback(hObject, eventdata, handles)
+% p = eventdata.Source.String(eventdata.Source.Value,:);
+p = eventdata.Source.Value;
+switch p
+    case 1
+        location = '227   0';
+    case 2
+        location = '0   409';
+end
+
+set(handles.textCurrentSelect,'String',location);
+
+% --- Executes during object creation, after setting all properties.
+function listboxPredefined_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to listboxPredefined (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: listbox controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+
+% --- Automatically list the place location(selected from the boxes)
+function pushbuttonAutoPlace_Callback(hObject, eventdata, handles)
+pushbuttonDetectBox_Callback(hObject, eventdata, handles);
+num2Place = get(handles.nPickTargetShow,'string');
+set(handles.nPlaceTargetShow,'string',num2Place);
+boxTotal = size(handles.b());
+tempDat=[];
+handles.box
+handles.b
+for bx = 1:boxTotal(1,1)
+    for layer = 1:6
+        tempDat(4*layer-3:4*layer,1:2) = handles.box{bx}.xy(:,:);
+        tempDat(4*layer-3:4*layer,3)   = handles.b(bx,3);
+    end   
+end
+tempDat
+
+% tempDat = tempDat(1:num2str(num2Place),:);
+
+set(handles.placeTargetList,'Data',tempDat);
+
+
+
+

@@ -9,9 +9,11 @@ stack = length(find(( xyt(1:C,1) < X+10) && (xyt(1:C,1) > X-10)...
     && (xyt(1:C,2) < Y+10) && (xyt(1:C,2) > Y-10) ));
 
 if X>128
-    Z = 147 + stack*6;
+    % On the table
+    Z = 152 + stack*7.5;
 else
-    Z = 22.1 + stack*6;
+    % On the conveyor
+    Z = 22.1 + stack*7.5;
 end
 
 return
