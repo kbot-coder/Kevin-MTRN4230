@@ -35,6 +35,9 @@ function automation_part2(c)
         pause(0.5);
         robot_status_loop;
         pause(0.5);
+        [status1,target_coor] = TOrobot(c(i,1),c(i,2),150+50,0,0,c(i,3));
+        pause(0.5);
+        robot_status_loop;
         num_stack = stack_counter('READ',flavour);
         offset = 150 + 3*num_stack;
         fprintf('to home ');
