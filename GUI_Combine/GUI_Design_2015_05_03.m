@@ -1283,14 +1283,17 @@ end
 % --- Executes on button press in pushbutton45.
 function pushbutton45_Callback(hObject, eventdata, handles)
 handles.pickTarget=[];
+handles.placeTarget=[];
 set(handles.pickTargetList,'Data',handles.pickTarget);
 set(handles.nPickTargetShow,'string','0');
+set(handles.placeTargetList,'Data',handles.placeTarget);
+set(handles.nPlaceTargetShow,'string','0');
 guidata(hObject, handles);
 
 
-% --- Executes on button press in pushbutton46.
-function pushbutton46_Callback(hObject, eventdata, handles)
-handles.placeTarget=[];
+% --- Executes on button press in deletePlaceData.
+function deletePlaceData_Callback(hObject, eventdata, handles)
+handles.placeTarget(handles.selectedPlace,:)=[];
 set(handles.placeTargetList,'Data',handles.placeTarget);
 set(handles.nPlaceTargetShow,'string','0');
 guidata(hObject, handles);
@@ -1360,3 +1363,47 @@ switch keyB
     case 'space'
         GetC_Coordinate_Callback(hObject, eventdata, handles);
 end
+
+
+% --- Executes on button press in addPlaceData.
+function addPlaceData_Callback(hObject, eventdata, handles)
+% hObject    handle to addPlaceData (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+newData = handles.placeTarget(handles.selectedPlace,:);
+handles.placeTarget = [handles.placeTarget ; newData];
+set(handles.placeTargetList,'Data',handles.placeTarget);
+guidata(hObject, handles);
+    
+
+
+% --- Executes on button press in pushbutton56.
+function pushbutton56_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton56 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+handles.pickTarget(handles.selectedPick,:)=[];
+set(handles.pickTargetList,'Data',handles.pickTarget);
+%set(handles.nPickTargetShow,'string','0');
+guidata(hObject, handles);
+
+
+% --- Executes on button press in pushbutton57.
+function pushbutton57_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton57 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+newData = handles.pickTarget(handles.selectedPick,:);
+handles.pickTarget = [handles.pickTarget ; newData];
+set(handles.pickTargetList,'Data',handles.pickTarget);
+guidata(hObject, handles);
+
+
+% --- Executes when selected cell(s) is changed in pickTargetList.
+function pickTargetList_CellSelectionCallback(hObject, eventdata, handles)
+% hObject    handle to pickTargetList (see GCBO)
+% eventdata  structure with the following fields (see MATLAB.UI.CONTROL.TABLE)
+%	Indices: row and column indices of the cell(s) currently selecteds
+% handles    structure with handles and user data (see GUIDATA)
+handles.selectedPick = eventdata.Indices(1);
+guidata(hObject, handles);
