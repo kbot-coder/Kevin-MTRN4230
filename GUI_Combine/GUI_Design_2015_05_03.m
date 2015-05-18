@@ -1260,24 +1260,23 @@ end
 % --- Executes on button press in pushbutton41.
 function pushbutton41_Callback(hObject, eventdata, handles)
 
-% try
+try
     Data = handles.chocolates;
     flavourColoum = Data(:,4);
     selectedData = [];
+    %% Milk check box
     if get(handles.selectMilk,'value')==1,
         Nstr = get(handles.nMilkInput,'string');
         if strcmp(Nstr,'all')==1,
             milkRow = find(flavourColoum==1);
-            selectedData = [selectedData ; Data(milkRow,:)];
-            
-            
+            selectedData = [selectedData ; Data(milkRow,:)];                  
         else
             N = uint16(str2double(Nstr));
             milkRow = find(flavourColoum==1);
             selectedData = [selectedData ; Data(milkRow(1:N),:)];
         end
-    end
-    
+    end    
+    %% Dark check box
     if get(handles.selectDark,'value')==1,
         Nstr = get(handles.nDarkInput,'string');
         darkRow = find(flavourColoum==2);
@@ -1287,7 +1286,8 @@ function pushbutton41_Callback(hObject, eventdata, handles)
             N = uint16(str2double(Nstr));
             selectedData = [selectedData ; Data(darkRow(1:N),:)];
         end
-    end
+    end    
+    %% Orange check box
     if get(handles.selectOrange,'value')==1,
         Nstr = get(handles.nOrangeInput,'string');
         orangeRow = find(flavourColoum==3);
@@ -1298,6 +1298,7 @@ function pushbutton41_Callback(hObject, eventdata, handles)
             selectedData = [selectedData ; Data(orangeRow(1:N),:)];
         end
     end
+    %% Mint check box
     if get(handles.selectMint,'value')==1,
         Nstr = get(handles.nMintInput,'string');
         mintRow = find(flavourColoum==4);
@@ -1308,6 +1309,7 @@ function pushbutton41_Callback(hObject, eventdata, handles)
             selectedData = [selectedData ; Data(mintRow(1:N),:)];
         end
     end
+    %% Back/Unknown check box
     if get(handles.selectBack,'value')==1,
         Nstr = get(handles.nBackInput,'string');
         backRow = find(flavourColoum==0);
@@ -1319,7 +1321,9 @@ function pushbutton41_Callback(hObject, eventdata, handles)
         end
     end
     
+    %% Highlights the Selected Chocolates
     axes(handles.axesTableSelect); cla;
+    set(handles.axesTableSelect,'color','none');
     for i=1:length(selectedData(:,1)),
         [Xr , Yr] = table2robot(selectedData(i,1),selectedData(i,2));
         newPickTarget = [double(Xr) , double(Yr) , handles.zTable , ...
@@ -1348,26 +1352,13 @@ function pushbutton41_Callback(hObject, eventdata, handles)
     handles.nPickTargetShow.String = numPICK;
     set(handles.pickTargetList,'data',oldPick );
     
-    handles.pickTarget=[];
-    
+    handles.pickTarget=[]; 
 
-% catch
-%     errordlg('Not Enough Chocolates');
-% end
+catch
+    set(handles.editCommand,'string','NOT enough chocolate' );
+end
 
-
-% newPick = str2num(get(handles.textCurrentSelect,'string'));
-% oldPick = get(handles.pickTargetList,'data');
-% set(handles.pickTargetList,'data',oldPick );
-% oldPick(end+1,:) = newPick;
-% 
-% numPICK = num2str(str2num(handles.nPickTargetShow.String)+1);
-% handles.nPickTargetShow.String = numPICK;
-% 
-% set(handles.pickTargetList,'data',oldPick );
-
-
-guidata(hObject, handles);
+% guidata(hObject, handles);
 
 
 
@@ -1749,11 +1740,13 @@ p = get(handles.pushbuttonAuto,'String');
 try
     switch p{1}
         case 'LOAD'
-            autoLoad(hObject, eventdata, handles)
+            autoLoad(hObject, eventdata, handles);
         case 'UNLOAD'
-            autoUnload(hObject, eventdata, handles)
-        case 'STACK'
-            autoStack(hObject, eventdata, handles)
+            autoUnload(hObject, eventdata, handles);
+        case 'STACK all'
+            autoStack(hObject, eventdata, handles);
+        case 'STACK 1'
+            autoStack1(hObject, eventdata, handles);    
         case 'Choose'
             set(handles.editCommand,'String','Please select a Mode');
     end
@@ -1762,18 +1755,65 @@ end
 set(handles.pushbuttonAuto,'String','Choose');
 guidata(hObject, handles);
 
+%% Auto Stacking ALL
+function autoStack(hObject, eventdata, handles)
+set(handles.editCommand,'String','Auto Stacking ALL'); drawnow;
+% Milk flavour: (x,y, theta) = (200, 100, 0°)
+% Dark flavour: (x,y, theta) = (200, 200, 0°)
+% Orange flavour: (x,y, theta) = (200, 300, 0°)
+% Mint flavour: (x,y, theta) = (200, 400, 0°)
+
+%% Auto Stacking ONLY 1 of each
+function autoStack1(hObject, eventdata, handles);
+set(handles.editCommand,'String','Stacking one of each flavour'); drawnow;
+% Clearing the PICK n PLACE table
+pushbutton45_Callback(hObject, eventdata, handles);
+pushbutton38_Callback(hObject, eventdata, handles);
+% Set the PICKs
+set(handles.selectMilk,'value',1);
+set(handles.selectDark,'value',1); 
+set(handles.selectOrange,'value',1);
+set(handles.selectMint,'value',1);
+set(handles.selectBack,'value',0); 
+
+set(handles.nMilkInput,'string','1');
+set(handles.nDarkInput,'string','1');
+set(handles.nOrangeInput,'string','1');
+set(handles.nMintInput,'string','1');
+
+pushbutton41_Callback(hObject, eventdata, handles);
+
+% Set the PLACEs, milk;dark;orange;mint
+placePose = [200, 100, 0;...
+             200, 200, 0;...
+             200, 300, 0;...
+             200, 400, 0];
+set(handles.placeTargetList,'data',placePose);
+set(handles.nPlaceTargetShow,'string',...
+    get(handles.nPickTargetShow,'String'));
+
+% Run 
+runButton_Callback(hObject, eventdata, handles);
+guidata(hObject, handles);
+
+
+
+
+
 %% Auto Load Function
 function autoLoad(hObject, eventdata, handles)
+% Set the PICKs
 set(handles.editCommand,'String','AutoLoading'); drawnow;
 pushbutton38_Callback(hObject, eventdata, handles);
-% The number of pickables
 set(handles.pickTargetList,'data',handles.ChocTable.Data(:,1:3));
 Sc = size(handles.ChocTable.Data());
 
+% Set The PLACEs
 set(handles.nPickTargetShow,'string',num2str(Sc(1,:)));
 pushbuttonDetectBox_Callback(hObject, eventdata, handles);
 
-
+% Run 
+runButton_Callback(hObject, eventdata, handles);
 guidata(hObject, handles);
 
 
@@ -1792,6 +1832,8 @@ switch p
         location = '227   0';
     case 2
         location = '0   409';
+    case 3
+        location = '200 100';        
 end
 
 set(handles.textCurrentSelect,'String',location);
