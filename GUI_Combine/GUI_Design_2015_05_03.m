@@ -111,12 +111,17 @@ handles.timer= timer(...
     'Period', 5, ...                              % Initial period is 0.1 sec.
     'TimerFcn', {@DetectChocolates,hObject,handles});  % Specify callback function that executed when timer iterated
 
-
+    %Calling robBIND
+handles.timer2= timer(...
+    'ExecutionMode', 'fixedRate', ...               % Run timer repeatedly in fix rate
+    'Period', 0.5, ...                              % Initial period is 0.1 sec.
+    'TimerFcn', {@UpdateConnection2,hObject,handles});  % Specify callback function that executed when timer iterated
+    
+    %Calling robSTAT
 handles.timer1= timer(...
     'ExecutionMode', 'fixedRate', ...               % Run timer repeatedly in fix rate
-    'Period', 1, ...                              % Initial period is 0.1 sec.
-    'TimerFcn', {@UpdateConnection,hObject,handles});  % Specify callback function that executed when timer iterated
-
+    'Period', 5, ...                              % Initial period is 0.1 sec.
+    'TimerFcn', {@UpdateConnection,hObject,handles}); 
 
 %% Timer that check the Steps Of Current Robot's Run & Run it
 handles.timerRunRobot= timer(...
@@ -456,8 +461,10 @@ if handles.Connect == 0,        % When it hasn't connected yet
         showImage(hObject,handles)
     end              
     start(handles.timer1);       % Start timer 1 to connect with robot studio periodically      
+    start(handles.timer2);
 else                            % When it already connected
-    stop(handles.timer1);        
+    stop(handles.timer1);   
+    stop(handles.timer2);delete(handles.timer2); 
     stop(handles.vid1);         % stop video 2 to disconnect from table camera
     stop(handles.vid2);         % stop video 2 to disconnect from conveyor camera
     delete(handles.timer1);        % Stop  to stop connection wit the robot
@@ -507,6 +514,19 @@ function ChocTable1_CreateFcn(hObject, eventdata, handles)
 
 function UpdateConnection(hObject,eventdata,hfigure,handles)
 % handles.robotStatus
+robStat = robSTAT;
+set(handles.textConnection,'String',robStat);
+switch robStat
+    case 'RED'
+        set(handles.textConnection,'ForegroundColor',[1 0 0]);
+    case 'YELLOW'
+        set(handles.textConnection,'ForegroundColor',[1 1 0]);
+    case 'GREEN'
+        set(handles.textConnection,'ForegroundColor',[0 1 0]);
+end
+
+function UpdateConnection2(hObject,eventdata,hfigure,handles)
+% handles.robotStatus
 robStat = robBIND;
 set(handles.textConnection,'String',robStat);
 
@@ -518,9 +538,6 @@ switch robStat
     case 'GREEN'
         set(handles.textConnection,'ForegroundColor',[0 1 0]);
 end
-
-
-
 
 function DetectChocolates(hObject,eventdata,hfigure,handles)
                   
@@ -597,7 +614,7 @@ try
     delete(handles.vid2);   % Delete object input vodeo 2 before closing the GUI
 catch
 end
-delete(handles.timer1);  % Delete object timer before closing the GUI
+delete(handles.timer1);delete(handles.timer2);  % Delete object timer before closing the GUI
 delete(handles.timer);  % Delete object timer before closing the GUI
 
 function showImage(hObject,handles)
@@ -1758,10 +1775,10 @@ guidata(hObject, handles);
 %% Auto Stacking ALL
 function autoStack(hObject, eventdata, handles)
 set(handles.editCommand,'String','Auto Stacking ALL'); drawnow;
-% Milk flavour: (x,y, theta) = (200, 100, 0°)
-% Dark flavour: (x,y, theta) = (200, 200, 0°)
-% Orange flavour: (x,y, theta) = (200, 300, 0°)
-% Mint flavour: (x,y, theta) = (200, 400, 0°)
+% Clearing the PICK n PLACE table
+pushbutton45_Callback(hObject, eventdata, handles);
+pushbutton38_Callback(hObject, eventdata, handles);
+
 
 %% Auto Stacking ONLY 1 of each
 function autoStack1(hObject, eventdata, handles);
