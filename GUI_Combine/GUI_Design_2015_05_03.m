@@ -690,8 +690,8 @@ for i=1:dataSize(1),
 end
 
 
-% --- Executes on button press in pushbutton38.
-function pushbutton38_Callback(hObject, eventdata, handles)
+% --- Executes on button press in findChocolatesButton.
+function findChocolatesButton_Callback(hObject, eventdata, handles)
 try 
     imgTable=getsnapshot(handles.vid1);     % capture image from video 1 (Table camera)
     set(handles.editCommand, 'string', 'Snaphot from Table Camera');
@@ -714,6 +714,7 @@ handles.chocolatesStr =reshape(strtrim(cellstr(num2str(handles.chocolates(:)))),
 set(handles.ChocTable,'Data',handles.chocolatesStr); % show data chocolate on the table 
 % set(handles.editCommand,'string','Done Detection');
 guidata(hObject, handles);
+
 
 % --- Executes on button press in runButton. 
 function runButton_Callback(hObject, eventdata, handles)
@@ -1275,8 +1276,8 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in pushbutton41.
-function pushbutton41_Callback(hObject, eventdata, handles)
+% --- Executes on button press in addChocolatesButton.
+function addChocolatesButton_Callback(hObject, eventdata, handles)
 
 try
     Data = handles.chocolates;
@@ -1402,8 +1403,8 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
 end
 
 
-% --- Executes on button press in pushbutton44.
-function pushbutton44_Callback(hObject, eventdata, handles)
+% --- Executes on button press in addToPickTargetButton.
+function addToPickTargetButton_Callback(hObject, eventdata, handles)
 [Xr , Yr] = table2robot(handles.selectedChocolate(1),handles.selectedChocolate(2));
 newPickTarget = [double(Xr) , double(Yr) , handles.zTable , ...
     handles.selectedChocolate(3)];
@@ -1439,16 +1440,16 @@ if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColo
 end
 
 
-% --- Executes on button press in pushbutton45.
-function pushbutton45_Callback(hObject, eventdata, handles)
+% --- Executes on button press in clearPickListButton.
+function clearPickListButton_Callback(hObject, eventdata, handles)
 handles.pickTarget=[];
 set(handles.pickTargetList,'Data',handles.pickTarget);
 set(handles.nPickTargetShow,'string','0');
 guidata(hObject, handles);
 
 
-% --- Executes on button press in pushbutton46.
-function pushbutton46_Callback(hObject, eventdata, handles)
+% --- Executes on button press in clearPlaceListButton.
+function clearPlaceListButton_Callback(hObject, eventdata, handles)
 handles.placeTarget=[];
 set(handles.placeTargetList,'Data',handles.placeTarget);
 set(handles.nPlaceTargetShow,'string','0');
@@ -1629,7 +1630,7 @@ end
 % --- Executes on button press in pushbutton55.
 function pushbutton55_Callback(hObject, eventdata, handles)
 % % % pushbuttonDetectBox_Callback(hObject, eventdata, handles);
-% % % pushbutton38_Callback(hObject, eventdata, handles);
+% % % findChocolatesButton_Callback(hObject, eventdata, handles);
 % % % % handles.b(1,3);
 % % % % handles.chocolates
 % % % % handles.box{1}.xy(1,1
@@ -1776,11 +1777,11 @@ guidata(hObject, handles);
 %% Auto Stacking ALL
 function autoStack(hObject, eventdata, handles)
 set(handles.editCommand,'String','Auto Stacking ALL'); drawnow;
-pushbutton38_Callback(hObject, eventdata, handles);
+findChocolatesButton_Callback(hObject, eventdata, handles);
 for i = 1:4 % For each flavour
     % Clearing the PICK n PLACE table
-    pushbutton45_Callback(hObject, eventdata, handles);
-    pushbutton38_Callback(hObject, eventdata, handles);
+    clearPickListButton_Callback(hObject, eventdata, handles);
+    findChocolatesButton_Callback(hObject, eventdata, handles);
     switch i
         case 1 % Milk
             % Set the PICKs
@@ -1796,18 +1797,15 @@ for i = 1:4 % For each flavour
             setOnly1('Mint','all',hObject, eventdata, handles);           
             placePose = [200, 400, 0];
     end
-    pushbutton41_Callback(hObject, eventdata, handles);drawnow;
+    addChocolatesButton_Callback(hObject, eventdata, handles);drawnow;
     set(handles.placeTargetList,'data',placePose);
     set(handles.nPlaceTargetShow,'string',...
         get(handles.nPickTargetShow,'String'));
     %     runButton_Callback(hObject, eventdata, handles);
     drawnow;
     pause(1);
-%     uwait(errordlg);
-    
+%     uwait(errordlg);   
 end
-
-
 guidata(hObject, handles);
 
 
@@ -1815,8 +1813,8 @@ guidata(hObject, handles);
 function autoStack1(hObject, eventdata, handles);
 set(handles.editCommand,'String','Stacking one of each flavour'); drawnow;
 % Clearing the PICK n PLACE table
-pushbutton45_Callback(hObject, eventdata, handles);
-pushbutton38_Callback(hObject, eventdata, handles);
+clearPickListButton_Callback(hObject, eventdata, handles);
+findChocolatesButton_Callback(hObject, eventdata, handles);
 % Set the PICKs
 set(handles.selectMilk,'value',1);
 set(handles.selectDark,'value',1); 
@@ -1829,7 +1827,7 @@ set(handles.nDarkInput,'string','1');
 set(handles.nOrangeInput,'string','1');
 set(handles.nMintInput,'string','1');
 
-pushbutton41_Callback(hObject, eventdata, handles);
+addChocolatesButton_Callback(hObject, eventdata, handles);
 
 % Set the PLACEs, milk;dark;orange;mint
 placePose = [200, 100, 0;...
@@ -1849,9 +1847,20 @@ guidata(hObject, handles);
 
 %% Auto Load Function
 function autoLoad(hObject, eventdata, handles)
+%function autoLoad(handles)
 % Set the PICKs
 set(handles.editCommand,'String','AutoLoading'); drawnow;
-pushbutton38_Callback(hObject, eventdata, handles);
+clearPickListButton_Callback(hObject, eventdata, handles)
+findChocolatesButton_Callback(hObject, eventdata, handles);
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %Convert into robot coordinate
+% Xt = handles.ChocTable.Data(:,1);
+% Yt = handles.ChocTable.Data(:,2);
+% theta = handles.ChocTable.Data(:,3);
+% [Xr,Yr] = table2robot(Xt,Yt)
+% Data = [Xr Yr theta]
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 set(handles.pickTargetList,'data',handles.ChocTable.Data(:,1:3));
 Sc = size(handles.ChocTable.Data());
 % Set The PLACEs
@@ -1859,7 +1868,7 @@ set(handles.nPickTargetShow,'string',num2str(Sc(1,1)));
 pushbuttonDetectBox_Callback(hObject, eventdata, handles);
 % Run 
 runButton_Callback(hObject, eventdata, handles);
-
+disp(handles.chocolates)
 guidata(hObject, handles);
 
 
@@ -1895,3 +1904,34 @@ end
 
 
 
+
+
+
+
+
+% % --- Executes on button press in clearPlaceListButton.
+% function clearPlaceListButton_Callback(hObject, eventdata, handles)
+% % hObject    handle to clearPlaceListButton (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% 
+% 
+% % --- Executes on button press in addToPickTargetButton.
+% function addToPickTargetButton_Callback(hObject, eventdata, handles)
+% % hObject    handle to addToPickTargetButton (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% 
+% 
+% % --- Executes on button press in findChocolatesButton.
+% function findChocolatesButton_Callback(hObject, eventdata, handles)
+% % hObject    handle to findChocolatesButton (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% 
+% 
+% % --- Executes on button press in addChocolatesButton.
+% function addChocolatesButton_Callback(hObject, eventdata, handles)
+% % hObject    handle to addChocolatesButton (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
