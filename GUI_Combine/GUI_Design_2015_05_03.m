@@ -234,137 +234,136 @@ function GetC_Coordinate_Callback(hObject, eventdata, handles)
 set(handles.editCommand,'string', 'Press ENTER to cancel' );
 
 [X, Y]=ginput(1);                                   % Get input coordinate from the table camera frame
-ax = gca; 
+ax = gca;
 [pick]= reachable(X,Y);
 if pick==1
-switch ax
-    case handles.axesConvSelect
-        location = 0;
-    case handles.axesConvDetect
-        location = 0;
-    case handles.axesConvCam
-        location = 0;
-    case handles.placeTargetAxes
-        location = 1;
-    case handles.axesTableSelect
-        location = 1;
-    case handles.axes3 
-        location = 1;
-    case handles.TableCam
-        location = 1;
-end
-
-
-switch location
-% switch location % 0 = conveyer camera, 1 = table camera
-    case 0
-    XR=900-Y; YR=X; XR=XR*1.5; YR=YR*1.5;               % Convert & adjust the measurement from pixle to mm
-    XR=int32(XR); YR=int32(YR);                         % Convert X & Y value into integer
-    % texboxStatus = sprintf('X = %d  Y = %d', XR, YR);   % Set data to be showed
-    % set(handles.C_Coordinate,'String',texboxStatus);    % Show value into textbox
-    % sender('0');                                        % Call sender function to send '0' as linear mode
-    % pause(0.01);
-    % data=sprintf('[%d,%d,150]',XR, YR);                 % Set data to be sended 
-    % sender(data);                                       % Call sender function to send data
-    % set ( handles.CmdStatus, 'String' ,...              % Show command in the command status
-    %     ['Move End Efector Robot Linear to ' ] );
-    inside = 0;
-    siz = size(handles.b);
-    for choco = 1:siz(1,1);
-        for reg = 1:4 
-            inside = inpolygon( X,Y,...
-                handles.box{choco}.rec{reg}(1,:),...
-                handles.box{choco}.rec{reg}(2,:));
-            if inside ~= 0
-                set(handles.editCommand,'string',...
-                    ['Yea Baby! it is inside '   num2str(choco) ] );
-                boxID = choco;
-                handles.bSelect = [boxID , reg];
-
-                tempStr = data2str(handles.box{boxID}.xy,reg,0);
-                set(handles.uitableRegion, 'data', tempStr);
-
-                tempStr = data2str(handles.b(:,3),boxID,0);
-                set(handles.uitableBox, 'data', tempStr);
-
-                 %plotting the rectangle 
-                axes(handles.axesConvSelect);
-                plot(handles.box{boxID}.rec{reg}(1,:),...
-                    handles.box{boxID}.rec{reg}(2,:), '--k');
-                set(handles.axesConvSelect,'color','none','Xlim'...
-                    ,[0 640],'ylim',[0 480]...
-                      ,'Xtick',[], 'Ytick',[]);
-                guidata(hObject, handles);
-
-                % Set the Currently Selected coordinate 
-                X = handles.box{boxID}.xy(reg,1);
-                Y = handles.box{boxID}.xy(reg,2);
-                [X,Y] = conveyor2robot(X,Y);
-                theta = handles.b(boxID,3);
-                set(handles.textCurrentSelect, 'string' ...
-                    , num2str([X Y theta]) );
-                return;
+    switch ax
+        case handles.axesConvSelect
+            location = 0;
+        case handles.axesConvDetect
+            location = 0;
+        case handles.axesConvCam
+            location = 0;
+        case handles.placeTargetAxes
+            location = 1;
+        case handles.axesTableSelect
+            location = 1;
+        case handles.axes3
+            location = 1;
+        case handles.TableCam
+            location = 1;
+    end
+      
+    switch location
+        % switch location % 0 = conveyer camera, 1 = table camera
+        case 0
+            XR=900-Y; YR=X; XR=XR*1.5; YR=YR*1.5;               % Convert & adjust the measurement from pixle to mm
+            XR=int32(XR); YR=int32(YR);                         % Convert X & Y value into integer
+            % texboxStatus = sprintf('X = %d  Y = %d', XR, YR);   % Set data to be showed
+            % set(handles.C_Coordinate,'String',texboxStatus);    % Show value into textbox
+            % sender('0');                                        % Call sender function to send '0' as linear mode
+            % pause(0.01);
+            % data=sprintf('[%d,%d,150]',XR, YR);                 % Set data to be sended
+            % sender(data);                                       % Call sender function to send data
+            % set ( handles.CmdStatus, 'String' ,...              % Show command in the command status
+            %     ['Move End Efector Robot Linear to ' ] );
+            inside = 0;
+            siz = size(handles.b);
+            for choco = 1:siz(1,1);
+                for reg = 1:4
+                    inside = inpolygon( X,Y,...
+                        handles.box{choco}.rec{reg}(1,:),...
+                        handles.box{choco}.rec{reg}(2,:));
+                    if inside ~= 0
+                        set(handles.editCommand,'string',...
+                            ['Yea Baby! it is inside '   num2str(choco) ] );
+                        boxID = choco;
+                        handles.bSelect = [boxID , reg];
+                        
+                        tempStr = data2str(handles.box{boxID}.xy,reg,0);
+                        set(handles.uitableRegion, 'data', tempStr);
+                        
+                        tempStr = data2str(handles.b(:,3),boxID,0);
+                        set(handles.uitableBox, 'data', tempStr);
+                        
+                        %plotting the rectangle
+                        axes(handles.axesConvSelect);
+                        plot(handles.box{boxID}.rec{reg}(1,:),...
+                            handles.box{boxID}.rec{reg}(2,:), '--k');
+                        set(handles.axesConvSelect,'color','none','Xlim'...
+                            ,[0 640],'ylim',[0 480]...
+                            ,'Xtick',[], 'Ytick',[]);
+                        guidata(hObject, handles);
+                        
+                        % Set the Currently Selected coordinate
+                        X = handles.box{boxID}.xy(reg,1);
+                        Y = handles.box{boxID}.xy(reg,2);
+                        [X,Y] = conveyor2robot(X,Y);
+                        theta = handles.b(boxID,3);
+                        set(handles.textCurrentSelect, 'string' ...
+                            , num2str([X Y theta]) );
+                        return;
+                    end
+                end
             end
-        end
+            
+            set(handles.uitableRegion, 'data', []);
+            
+            tempStr = data2str(handles.b(:,3),0,0);
+            set(handles.uitableBox, 'data', tempStr);
+            set(handles.editCommand,'string','Not In Any Box' );
+            axes(handles.axesConvSelect);cla;
+            set(handles.axesConvSelect,'color','none','Xlim'...
+                ,[0 640],'ylim',[0 480]...
+                ,'Xtick',[], 'Ytick',[]);
+            
+            % Set the Currently Selected coordinate . theta is left to be 0 for now
+            [X,Y] = conveyor2robot(X,Y);
+            the = get(handles.editThetaClick,'String');
+            set(handles.textCurrentSelect, 'string' , [num2str([X Y]) '   ' the ] );
+            %% Case Table axes
+        case 1
+            xx = X;
+            yy = Y;
+            
+            Data = handles.chocolates;
+            dataSize = size(Data);
+            selectedData = [];
+            Row = [];
+            for i=1:dataSize(1),
+                in = checkPoint(xx , yy , Data(i,1) , Data(i,2),  -Data(i,3));
+                if in == 1,
+                    selectedData = Data(i,:);
+                    Row = [Row,i];
+                    tempX = Data(i,1);
+                    tempY = Data(i,2);
+                    tempT = Data(i,3);
+                    [tempX, tempY] = table2robot(tempX,tempY);
+                    % show in the 'Currently Selected'
+                    set(handles.textCurrentSelect, 'string' ,...
+                        num2str([tempX tempY tempT]) );
+                    break;
+                end
+            end;
+            axes(handles.axesTableSelect); cla;
+            set(handles.axesTableSelect,'color','none');
+            try
+                plotRectangle(selectedData(1,1) , selectedData(1,2),  -selectedData(1,3))
+                handles.chocolatesStr =reshape(strtrim(cellstr(num2str(handles.chocolates(:)))),...
+                    size(handles.chocolates));
+                handles.chocolatesStr(Row,:) = strcat('<html><body bgcolor="#0000FF" text="#FFFFFF" width="100px">', ...
+                    handles.chocolatesStr(Row,:),'</span></html>');
+                set(handles.ChocTable,'Data',handles.chocolatesStr);
+                
+            catch
+                set(handles.editCommand,'string','TABLE : Not In Any Box' );
+                [X, Y] = table2robot(X, Y);
+                the = get(handles.editThetaClick,'String');
+                set(handles.textCurrentSelect, 'string' , [num2str([X Y]) '   ' the ]);
+            end
     end
-
-    set(handles.uitableRegion, 'data', []);
-
-    tempStr = data2str(handles.b(:,3),0,0);
-    set(handles.uitableBox, 'data', tempStr);
-    set(handles.editCommand,'string','Not In Any Box' );
-    axes(handles.axesConvSelect);cla;
-    set(handles.axesConvSelect,'color','none','Xlim'...
-        ,[0 640],'ylim',[0 480]...
-          ,'Xtick',[], 'Ytick',[]);
-    
-    % Set the Currently Selected coordinate . theta is left to be 0 for now 
-    [X,Y] = conveyor2robot(X,Y);
-    the = get(handles.editThetaClick,'String');
-    set(handles.textCurrentSelect, 'string' , [num2str([X Y]) '   ' the ] );
-%% Case Table axes
-    case 1
-    xx = X;
-    yy = Y;
-
-    Data = handles.chocolates;
-    dataSize = size(Data);
-    selectedData = [];
-    Row = [];
-    for i=1:dataSize(1),
-        in = checkPoint(xx , yy , Data(i,1) , Data(i,2),  -Data(i,3));
-        if in == 1,
-            selectedData = Data(i,:);
-            Row = [Row,i];
-            tempX = Data(i,1);
-            tempY = Data(i,2);
-            tempT = Data(i,3);
-            [tempX, tempY] = table2robot(tempX,tempY);
-            % show in the 'Currently Selected'
-            set(handles.textCurrentSelect, 'string' ,...
-                num2str([tempX tempY tempT]) );
-            break;
-        end
-    end;
-    axes(handles.axesTableSelect); cla; 
-    set(handles.axesTableSelect,'color','none');
-    try
-        plotRectangle(selectedData(1,1) , selectedData(1,2),  -selectedData(1,3))
-        handles.chocolatesStr =reshape(strtrim(cellstr(num2str(handles.chocolates(:)))),...
-            size(handles.chocolates));
-        handles.chocolatesStr(Row,:) = strcat('<html><body bgcolor="#0000FF" text="#FFFFFF" width="100px">', ...
-                handles.chocolatesStr(Row,:),'</span></html>');
-        set(handles.ChocTable,'Data',handles.chocolatesStr);
-
-    catch
-        set(handles.editCommand,'string','TABLE : Not In Any Box' );
-        [X, Y] = table2robot(X, Y);
-        the = get(handles.editThetaClick,'String');
-        set(handles.textCurrentSelect, 'string' , [num2str([X Y]) '   ' the ]);
-    end
-end
-else 
-    errordlg('Unreachable Chocolate. Select again'); 
+else
+    errordlg('Unreachable Chocolate. Select again');
 end
 
 %%
@@ -679,7 +678,7 @@ try
     imgTable=getsnapshot(handles.vid1);     % capture image from video 1 (Table camera)
     set(handles.editCommand, 'string', 'Snaphot from Table Camera');
 catch
-    imgTable=imread('IMG_005.jpg');
+    imgTable=imread('IMG_013.jpg');
     set(handles.editCommand, 'string', 'Saved Image');
 end
 axes(handles.TableCam);
@@ -793,6 +792,27 @@ set(handles.uitableBox, 'data', handles.b(:,3));
 
 set(handles.editCommand, 'String', 'Done Boxes Detection');
 % assignin('base', 'handles', handles);
+num2Place = (get(handles.nPickTargetShow,'string'));
+
+
+if str2num(num2Place) > 0
+    set(handles.nPlaceTargetShow,'string',num2Place);    
+    boxTotal = size(handles.b());
+    tempDat=[];
+    for bx = 1:boxTotal(1,1)
+        for layer = 1:6
+            tempDat(4*layer-3:4*layer,1:2) = handles.box{bx}.xy(:,:);
+            tempDat(4*layer-3:4*layer,3)   = handles.b(bx,3);
+        end
+    end
+    tempDat = tempDat(1:str2num(num2Place),:);
+    set(handles.placeTargetList,'Data',tempDat);
+else
+    set(handles.placeTargetList,'Data',[]);
+    set(handles.editCommand,'string','Select PICKs 1st');
+end
+
+
 guidata(hObject, handles);
 
 
@@ -1460,7 +1480,7 @@ if handles.chocolates(:,5)==1
 
     set(handles.pickTargetList,'data',oldPick );
     
-else 
+else     
     errordlg('Unreachable Chocolate. Select again'); 
 end
 
@@ -1746,13 +1766,14 @@ guidata(hObject, handles);
 function autoLoad(hObject, eventdata, handles)
 set(handles.editCommand,'String','AutoLoading'); drawnow;
 pushbutton38_Callback(hObject, eventdata, handles);
-
 % The number of pickables
 set(handles.pickTargetList,'data',handles.ChocTable.Data(:,1:3));
 Sc = size(handles.ChocTable.Data());
 
 set(handles.nPickTargetShow,'string',num2str(Sc(1,:)));
-pushbuttonAutoPlace_Callback(hObject, eventdata, handles);
+pushbuttonDetectBox_Callback(hObject, eventdata, handles);
+
+
 guidata(hObject, handles);
 
 
@@ -1788,28 +1809,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
-
-% --- Automatically list the place location(selected from the boxes)
-function pushbuttonAutoPlace_Callback(hObject, eventdata, handles)
-pushbuttonDetectBox_Callback(hObject, eventdata, handles);
-num2Place = get(handles.nPickTargetShow,'string');
-set(handles.nPlaceTargetShow,'string',num2Place);
-boxTotal = size(handles.b());
-tempDat=[];
-handles.box
-handles.b
-for bx = 1:boxTotal(1,1)
-    for layer = 1:6
-        tempDat(4*layer-3:4*layer,1:2) = handles.box{bx}.xy(:,:);
-        tempDat(4*layer-3:4*layer,3)   = handles.b(bx,3);
-    end   
-end
-tempDat
-
-% tempDat = tempDat(1:num2str(num2Place),:);
-
-set(handles.placeTargetList,'Data',tempDat);
 
 
 
