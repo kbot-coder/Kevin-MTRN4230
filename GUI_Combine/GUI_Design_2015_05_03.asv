@@ -111,12 +111,17 @@ handles.timer= timer(...
     'Period', 5, ...                              % Initial period is 0.1 sec.
     'TimerFcn', {@DetectChocolates,hObject,handles});  % Specify callback function that executed when timer iterated
 
-
+    %Calling robBIND
+handles.timer2= timer(...
+    'ExecutionMode', 'fixedRate', ...               % Run timer repeatedly in fix rate
+    'Period', 0.5, ...                              % Initial period is 0.1 sec.
+    'TimerFcn', {@UpdateConnection2,hObject,handles});  % Specify callback function that executed when timer iterated
+    
+    %Calling robSTAT
 handles.timer1= timer(...
     'ExecutionMode', 'fixedRate', ...               % Run timer repeatedly in fix rate
-    'Period', 1, ...                              % Initial period is 0.1 sec.
-    'TimerFcn', {@UpdateConnection,hObject,handles});  % Specify callback function that executed when timer iterated
-
+    'Period', 5, ...                              % Initial period is 0.1 sec.
+    'TimerFcn', {@UpdateConnection,hObject,handles}); 
 
 %% Timer that check the Steps Of Current Robot's Run & Run it
 handles.timerRunRobot= timer(...
@@ -456,8 +461,10 @@ if handles.Connect == 0,        % When it hasn't connected yet
         showImage(hObject,handles)
     end              
     start(handles.timer1);       % Start timer 1 to connect with robot studio periodically      
+    start(handles.timer2);
 else                            % When it already connected
-    stop(handles.timer1);        
+    stop(handles.timer1);   
+    stop(handles.timer2);delete(handles.timer2); 
     stop(handles.vid1);         % stop video 2 to disconnect from table camera
     stop(handles.vid2);         % stop video 2 to disconnect from conveyor camera
     delete(handles.timer1);        % Stop  to stop connection wit the robot
@@ -507,6 +514,19 @@ function ChocTable1_CreateFcn(hObject, eventdata, handles)
 
 function UpdateConnection(hObject,eventdata,hfigure,handles)
 % handles.robotStatus
+robStat = robSTAT;
+set(handles.textConnection,'String',robStat);
+switch robStat
+    case 'RED'
+        set(handles.textConnection,'ForegroundColor',[1 0 0]);
+    case 'YELLOW'
+        set(handles.textConnection,'ForegroundColor',[1 1 0]);
+    case 'GREEN'
+        set(handles.textConnection,'ForegroundColor',[0 1 0]);
+end
+
+function UpdateConnection2(hObject,eventdata,hfigure,handles)
+% handles.robotStatus
 robStat = robBIND;
 set(handles.textConnection,'String',robStat);
 
@@ -518,9 +538,6 @@ switch robStat
     case 'GREEN'
         set(handles.textConnection,'ForegroundColor',[0 1 0]);
 end
-
-
-
 
 function DetectChocolates(hObject,eventdata,hfigure,handles)
                   
@@ -565,11 +582,12 @@ switch conn
                 TOio(0,0,0,0,300);
                 pause(0.5);
                 xyt = get(handles.pickTargetList,'data');
-                try
+                maxStep = size(xyt);
+                if stepNum <= maxStep(1,1) %% Chenged. might be buggy
                     [ X, Y, Z, theta] = getZloc(xyt, stepNum);
                     TOrobot(X, Y, Z, 0, 0, theta);
                     robStat(1:5) = 'PICK ';
-                catch
+                else
                     set(handles.editCommand,'String','DONE Picks and Loads');
                     set(handles.textRobotStatus,'String','STAND BY');
                     set(handles.runButton,'String','RUN');
@@ -597,7 +615,7 @@ try
     delete(handles.vid2);   % Delete object input vodeo 2 before closing the GUI
 catch
 end
-delete(handles.timer1);  % Delete object timer before closing the GUI
+delete(handles.timer1);delete(handles.timer2);  % Delete object timer before closing the GUI
 delete(handles.timer);  % Delete object timer before closing the GUI
 
 function showImage(hObject,handles)
@@ -1758,32 +1776,70 @@ guidata(hObject, handles);
 %% Auto Stacking ALL
 function autoStack(hObject, eventdata, handles)
 set(handles.editCommand,'String','Auto Stacking ALL'); drawnow;
-% Milk flavour: (x,y, theta) = (200, 100, 0°)
-% Dark flavour: (x,y, theta) = (200, 200, 0°)
-% Orange flavour: (x,y, theta) = (200, 300, 0°)
-% Mint flavour: (x,y, theta) = (200, 400, 0°)
+
+for i = 1:4 % For each flavour
+    % Clearing the PICK n PLACE table
+    pushbutton45_Callback(hObject, eventdata, handles);
+    pushbutton38_Callback(hObject, eventdata, handles);
+    switch i
+        case 1 % Milk
+            % Set the PICKs
+            setOnly1('Milk','all',hObject, eventdata, handles);
+            placePose = [200, 100, 0];
+        case 2 % Dark
+            setOnly1('Dark','all',hObject, eventdata, handles);
+            placePose = [200, 200, 0];
+        case 3 % Orange
+            setOnly1('Orange','all',hObject, eventdata, handles);
+            placePose = [200, 300, 0]; 
+        case 4 % Mint
+            setOnly1('Mint','all',hObject, eventdata, handles);           
+            placePose = [200, 400, 0];
+    end
+    pushbutton41_Callback(hObject, eventdata, handles);
+    set(handles.placeTargetList,'data',placePose);
+    set(handles.nPlaceTargetShow,'string',...
+        get(handles.nPickTargetShow,'String'));
+%     runButton_Callback(hObject, eventdata, handles);
+pause 
+end
+
+
+guidata(hObject, handles);
+
 
 %% Auto Stacking ONLY 1 of each
 function autoStack1(hObject, eventdata, handles);
 set(handles.editCommand,'String','Stacking one of each flavour'); drawnow;
-
-% Set the PICKs
+% Clearing the PICK n PLACE table
+pushbutton45_Callback(hObject, eventdata, handles);
 pushbutton38_Callback(hObject, eventdata, handles);
-% 1 Milk
+% Set the PICKs
 set(handles.selectMilk,'value',1);
 set(handles.selectDark,'value',1); 
 set(handles.selectOrange,'value',1);
 set(handles.selectMint,'value',1);
 set(handles.selectBack,'value',0); 
 
+set(handles.nMilkInput,'string','1');
+set(handles.nDarkInput,'string','1');
+set(handles.nOrangeInput,'string','1');
+set(handles.nMintInput,'string','1');
 
+pushbutton41_Callback(hObject, eventdata, handles);
 
-nMilkInput
-nDarkInput
-set(handles.pickTargetList,'data',handles.ChocTable.Data(:,1:3));
+% Set the PLACEs, milk;dark;orange;mint
+placePose = [200, 100, 0;...
+             200, 200, 0;...
+             200, 300, 0;...
+             200, 400, 0];
+set(handles.placeTargetList,'data',placePose);
+set(handles.nPlaceTargetShow,'string',...
+    get(handles.nPickTargetShow,'String'));
+% Run 
+runButton_Callback(hObject, eventdata, handles);
+guidata(hObject, handles);
 
-
-Sc = size(handles.ChocTable.Data());
 
 
 

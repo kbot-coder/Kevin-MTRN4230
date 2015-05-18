@@ -1,0 +1,21 @@
+% Set the selection to only one selection box for the flavour
+function setOnly1(flav , amount)
+    switch flav
+        case 'Milk'
+                set(handles.selectMilk,'value',1);
+    set(handles.selectDark,'value',1); 
+    set(handles.selectOrange,'value',1);
+    set(handles.selectMint,'value',1);
+    set(handles.selectBack,'value',0); 
+
+    set(handles.nMilkInput,'string','1');
+    set(handles.nDarkInput,'string','1');
+    set(handles.nOrangeInput,'string','1');
+    set(handles.nMintInput,'string','1');
+        case 'Dark'
+            
+        case 'Orange'
+            
+        case 'Mint'
+    end
+end

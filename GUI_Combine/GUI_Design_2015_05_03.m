@@ -582,11 +582,12 @@ switch conn
                 TOio(0,0,0,0,300);
                 pause(0.5);
                 xyt = get(handles.pickTargetList,'data');
-                try
+                maxStep = size(xyt);
+                if stepNum <= maxStep(1,1) %% Chenged. might be buggy
                     [ X, Y, Z, theta] = getZloc(xyt, stepNum);
                     TOrobot(X, Y, Z, 0, 0, theta);
                     robStat(1:5) = 'PICK ';
-                catch
+                else
                     set(handles.editCommand,'String','DONE Picks and Loads');
                     set(handles.textRobotStatus,'String','STAND BY');
                     set(handles.runButton,'String','RUN');
@@ -1775,9 +1776,39 @@ guidata(hObject, handles);
 %% Auto Stacking ALL
 function autoStack(hObject, eventdata, handles)
 set(handles.editCommand,'String','Auto Stacking ALL'); drawnow;
-% Clearing the PICK n PLACE table
-pushbutton45_Callback(hObject, eventdata, handles);
 pushbutton38_Callback(hObject, eventdata, handles);
+for i = 1:4 % For each flavour
+    % Clearing the PICK n PLACE table
+    pushbutton45_Callback(hObject, eventdata, handles);
+    pushbutton38_Callback(hObject, eventdata, handles);
+    switch i
+        case 1 % Milk
+            % Set the PICKs
+            setOnly1('Milk','all',hObject, eventdata, handles);
+            placePose = [200, 100, 0];
+        case 2 % Dark
+            setOnly1('Dark','all',hObject, eventdata, handles);
+            placePose = [200, 200, 0];
+        case 3 % Orange
+            setOnly1('Orange','all',hObject, eventdata, handles);
+            placePose = [200, 300, 0]; 
+        case 4 % Mint
+            setOnly1('Mint','all',hObject, eventdata, handles);           
+            placePose = [200, 400, 0];
+    end
+    pushbutton41_Callback(hObject, eventdata, handles);drawnow;
+    set(handles.placeTargetList,'data',placePose);
+    set(handles.nPlaceTargetShow,'string',...
+        get(handles.nPickTargetShow,'String'));
+    %     runButton_Callback(hObject, eventdata, handles);
+    drawnow;
+    pause(1);
+%     uwait(errordlg);
+    
+end
+
+
+guidata(hObject, handles);
 
 
 %% Auto Stacking ONLY 1 of each
@@ -1808,7 +1839,6 @@ placePose = [200, 100, 0;...
 set(handles.placeTargetList,'data',placePose);
 set(handles.nPlaceTargetShow,'string',...
     get(handles.nPickTargetShow,'String'));
-
 % Run 
 runButton_Callback(hObject, eventdata, handles);
 guidata(hObject, handles);
@@ -1824,20 +1854,13 @@ set(handles.editCommand,'String','AutoLoading'); drawnow;
 pushbutton38_Callback(hObject, eventdata, handles);
 set(handles.pickTargetList,'data',handles.ChocTable.Data(:,1:3));
 Sc = size(handles.ChocTable.Data());
-
 % Set The PLACEs
-set(handles.nPickTargetShow,'string',num2str(Sc(1,:)));
+set(handles.nPickTargetShow,'string',num2str(Sc(1,1)));
 pushbuttonDetectBox_Callback(hObject, eventdata, handles);
-
 % Run 
 runButton_Callback(hObject, eventdata, handles);
+
 guidata(hObject, handles);
-
-
-
-
-
-
 
 
 % --- Executes on selection change in listboxPredefined.
