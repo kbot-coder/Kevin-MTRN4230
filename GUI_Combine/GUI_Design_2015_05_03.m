@@ -904,6 +904,7 @@ end
 % --- Executes when selected cell(s) is changed in ChocTable.
 function ChocTable_CellSelectionCallback(hObject, eventdata, handles)
 try
+handles.chocolates = getappdata(hObject.Parent,'chocolatesData');
 handles.selectedRow = eventdata.Indices(1);
 handles.selectedChocolate = handles.chocolates(handles.selectedRow,:);
 handles.chocolatesStr =reshape(strtrim(cellstr(num2str(handles.chocolates(:)))),...
@@ -1853,13 +1854,14 @@ function autoLoad(hObject, eventdata, handles)
 set(handles.editCommand,'String','AutoLoading'); drawnow;
 clearPickListButton_Callback(hObject, eventdata, handles)
 findChocolatesButton_Callback(hObject, eventdata, handles);
-chocolatesData= getappdata(hObject.Parent,'chocolatesData');
-disp(chocolatesData)
+handles.chocolates= getappdata(hObject.Parent,'chocolatesData');
+setappdata(hObject.Parent,'chocolatesData',handles.chocolates);
+disp(handles.chocolates)
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Convert into robot coordinate
-Xt = chocolatesData(:,1);
-Yt = chocolatesData(:,2);
-theta = chocolatesData(:,3);
+Xt = handles.chocolates(:,1);
+Yt = handles.chocolates(:,2);
+theta = handles.chocolates(:,3);
 [Xr,Yr] = table2robot(Xt,Yt);
 newData = [Xr Yr theta];
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1871,7 +1873,7 @@ set(handles.nPickTargetShow,'string',num2str(Sc(1,1)));
 pushbuttonDetectBox_Callback(hObject, eventdata, handles);
 % Run 
 runButton_Callback(hObject, eventdata, handles);
-disp(chocolatesData)
+disp(handles.chocolates)
 guidata(hObject, handles);
 
 
@@ -1938,3 +1940,15 @@ end
 % % hObject    handle to addChocolatesButton (see GCBO)
 % % eventdata  reserved - to be defined in a future version of MATLAB
 % % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes when entered data in editable cell(s) in ChocTable.
+function ChocTable_CellEditCallback(hObject, eventdata, handles)
+% hObject    handle to ChocTable (see GCBO)
+% eventdata  structure with the following fields (see MATLAB.UI.CONTROL.TABLE)
+%	Indices: row and column indices of the cell(s) edited
+%	PreviousData: previous data for the cell(s) edited
+%	EditData: string(s) entered by the user
+%	NewData: EditData or its converted form set on the Data property. Empty if Data was not changed
+%	Error: error string when failed to convert EditData to appropriate value for Data
+% handles    structure with handles and user data (see GUIDATA)
