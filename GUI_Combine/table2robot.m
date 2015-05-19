@@ -11,4 +11,6 @@ for i=1:length(Xt),
     Xr(i) = (RCoor(1));
     Yr(i) = (RCoor(2));
 end
+Xr = Xr';
+Yr = Yr';
 return

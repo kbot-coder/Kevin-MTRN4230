@@ -709,6 +709,7 @@ c = findChoc((imgTable));   % HERE THE CHOC DETECTION
 set(handles.axes3,'xtick',[],'ytick',[]);       % Supress the axes3 axis value
 
 handles.chocolates =c(:,[1:3 6 8]);
+setappdata(hObject.Parent,'chocolatesData',handles.chocolates);
 handles.chocolatesStr =reshape(strtrim(cellstr(num2str(handles.chocolates(:)))),...
         size(handles.chocolates));
 set(handles.ChocTable,'Data',handles.chocolatesStr); % show data chocolate on the table 
@@ -1852,23 +1853,25 @@ function autoLoad(hObject, eventdata, handles)
 set(handles.editCommand,'String','AutoLoading'); drawnow;
 clearPickListButton_Callback(hObject, eventdata, handles)
 findChocolatesButton_Callback(hObject, eventdata, handles);
-
+chocolatesData= getappdata(hObject.Parent,'chocolatesData');
+disp(chocolatesData)
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %Convert into robot coordinate
-% Xt = handles.ChocTable.Data(:,1);
-% Yt = handles.ChocTable.Data(:,2);
-% theta = handles.ChocTable.Data(:,3);
-% [Xr,Yr] = table2robot(Xt,Yt)
-% Data = [Xr Yr theta]
+%Convert into robot coordinate
+Xt = chocolatesData(:,1);
+Yt = chocolatesData(:,2);
+theta = chocolatesData(:,3);
+[Xr,Yr] = table2robot(Xt,Yt);
+newData = [Xr Yr theta];
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-set(handles.pickTargetList,'data',handles.ChocTable.Data(:,1:3));
-Sc = size(handles.ChocTable.Data());
+%set(handles.pickTargetList,'data',handles.ChocTable.Data(:,1:3));
+set(handles.pickTargetList,'data',newData);
+Sc = size(newData);
 % Set The PLACEs
 set(handles.nPickTargetShow,'string',num2str(Sc(1,1)));
 pushbuttonDetectBox_Callback(hObject, eventdata, handles);
 % Run 
 runButton_Callback(hObject, eventdata, handles);
-disp(handles.chocolates)
+disp(chocolatesData)
 guidata(hObject, handles);
 
 
