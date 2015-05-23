@@ -38,7 +38,7 @@ while i<N
     hold on
     
 end
-    theta = 0 : 0.01 : pi;
+    theta = 0 : 0.01 : pi/2;
     x = xRadius * cos(theta) + xCenter;
     y = yRadius * sin(theta) + yCenter;
     plot(x, y, 'LineWidth', 1);
