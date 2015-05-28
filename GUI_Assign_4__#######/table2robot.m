@@ -1,5 +1,4 @@
 % convert pixel coordinate from TABLE camera to robot coordinate 
-
 function [Xr,Yr] = table2robot(Xt,Yt)
 for i=1:length(Xt),
     R = [0 1 ; 1 0];

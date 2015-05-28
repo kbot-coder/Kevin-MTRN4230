@@ -562,7 +562,7 @@ xytPLACE = get(handles.placeTargetList,'data');
 switch step(1:5)
     %------------- PICKING STEPS ------------------------------------
     case 'PICK ' % Go to the picking location
-        [ X, Y, Z, theta] = getZloc(xytPICK, stepNum);
+        [ X, Y, Z, theta] = getZloc(xytPICK, stepNum,'PICK');
         if  strcmp(TOrobot(X, Y, Z, 0, 0, theta),'DONE')
             set(handles.textRobotStatus,'String',['PICK_' num2str(stepNum)]);
             set(handles.textConnection,'String','YELLOW');
@@ -587,7 +587,7 @@ switch step(1:5)
             set(handles.textRobotStatus,'String',['g1UP ' num2str(stepNum)]);
         end 
     case 'g1UP ' % Elevate the chocolate(prevent collision with other choc)
-        [ X, Y, Z, theta] = getZloc(xytPICK, stepNum);
+        [ X, Y, Z, theta] = getZloc(xytPICK, stepNum,'PICK');
         if  strcmp(TOrobot(X, Y, Z+50, 0, 0, theta),'DONE')
             set(handles.textRobotStatus,'String',['g1UP_' num2str(stepNum)]); 
             set(handles.textConnection,'String','YELLOW');
@@ -608,7 +608,7 @@ switch step(1:5)
         end   
    %------------- LOADING/PLACING STEPS ----------------------------------
     case 'LOAD ' % Go to the loading/place location
-        [ X, Y, Z, theta] = getZloc(xytPLACE, stepNum);
+        [ X, Y, Z, theta] = getZloc(xytPLACE, stepNum, 'PLACE');
         if  strcmp(TOrobot(X, Y, Z, 0, 0, theta),'DONE')
             set(handles.textRobotStatus,'String',['LOAD_' num2str(stepNum)]);
         else
@@ -631,7 +631,7 @@ switch step(1:5)
         end
         
     case 'g2UP ' % Go up
-        [ X, Y, Z, theta] = getZloc(xytPLACE, stepNum);
+        [ X, Y, Z, theta] = getZloc(xytPLACE, stepNum,'PLACE');
         if  strcmp(TOrobot(X, Y, Z, 0, 0, theta),'DONE')
             set(handles.textRobotStatus,'String',['g2UP_' num2str(stepNum+1)]);
         else
@@ -774,7 +774,6 @@ handles.chocolatesStr =reshape(strtrim(cellstr(num2str(handles.chocolates(:)))),
 set(handles.ChocTable,'Data',handles.chocolatesStr); % show data chocolate on the table 
 % set(handles.editCommand,'string','Done Detection');
 guidata(hObject, handles);
-
 
 % --- Executes on button press in runButton. 
 function runButton_Callback(hObject, eventdata, handles)
@@ -1897,36 +1896,23 @@ guidata(hObject, handles);
 
 %% Auto Stacking ALL
 function autoStack(hObject, eventdata, handles)
-set(handles.editCommand,'String','Auto Stacking ALL'); drawnow;
-findChocolatesButton_Callback(hObject, eventdata, handles);
-for i = 1:4 % For each flavour
-    % Clearing the PICK n PLACE table
-    clearPickListButton_Callback(hObject, eventdata, handles);
-    findChocolatesButton_Callback(hObject, eventdata, handles);
-    switch i
-        case 1 % Milk
-            % Set the PICKs
-            setOnly1('Milk','all',hObject, eventdata, handles);
-            placePose = [200, 100, 0];
-        case 2 % Dark
-            setOnly1('Dark','all',hObject, eventdata, handles);
-            placePose = [200, 200, 0];
-        case 3 % Orange
-            setOnly1('Orange','all',hObject, eventdata, handles);
-            placePose = [200, 300, 0]; 
-        case 4 % Mint
-            setOnly1('Mint','all',hObject, eventdata, handles);           
-            placePose = [200, 400, 0];
-    end
-    addChocolatesButton_Callback(hObject, eventdata, handles);drawnow;
-    set(handles.placeTargetList,'data',placePose);
-    set(handles.nPlaceTargetShow,'string',...
-        get(handles.nPickTargetShow,'String'));
-    %     runButton_Callback(hObject, eventdata, handles);
-    drawnow;
-    pause(1);
-%     uwait(errordlg);   
+% clearing the PICK and PLACE table
+clearPickListButton_Callback(hObject, eventdata, handles);
+clearPlaceListButton_Callback(hObject, eventdata, handles);
+% donkey
+try 
+    imgTable=getsnapshot(handles.vid1);     % capture image from video 1 (Table camera)
+    set(handles.editCommand, 'string', 'Snaphot from Table Camera');
+catch
+    imgTable=imread('IMG_005.jpg');
+    set(handles.editCommand, 'string', 'Saved Image');
 end
+drawnow;
+
+[c]= findChocNoPlot(imgTable);
+c = unique(c,'rows');
+disp('DONE');
+disp(c);
 guidata(hObject, handles);
 
 
