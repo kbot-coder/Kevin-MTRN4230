@@ -1,0 +1,15 @@
+conn.mat 
+: imConnect = image array of the connected icon;
+: imDisconnect = image array of the disconnected icon;
+
+referencImages.mat
+	used bt findChoc function. contains all the information of the reference images.
+
+FUNCTIONS :
+
+findChoc.m
+	find the status of al chocolates 
+
+plotBoxConv.m
+	find and plot the regions of each box
+
