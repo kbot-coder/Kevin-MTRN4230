@@ -1939,8 +1939,9 @@ set(handles.placeTargetList,'data',toPick);
 set(handles.nPickTargetShow,'string',num2str(n2pick));
 set(handles.nPlaceTargetShow,'string',num2str(n2pick));
 
-disp('DONE');
 disp(c);
+runButton_Callback(hObject, eventdata, handles)
+disp('DONE');
 guidata(hObject, handles);
 
 
