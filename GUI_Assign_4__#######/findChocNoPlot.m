@@ -1,6 +1,6 @@
 %% find and return the data of each chocolates without plotting anything
 % Only work on the TABLE axes
-% c = [X Y Z theta flavour pick]
+% c = [Xr, Yr, theta, Realflavi,reachable];
 function c = findChocNoPlot(chocImage)
 %% Load reference image
     c   = [];
@@ -113,8 +113,8 @@ function c = findChocNoPlot(chocImage)
                            otherwise
                                Realflavi=0;
                        end
-                        cc(found,:)  = [X, Y, theta,...
-                            177, 81, Realflavi, topBtm, reach, pick ];
+%                         cc(found,:)  = [X, Y, theta,...
+%                             177, 81, Realflavi, topBtm, reach, pick ];
                         [Xr,Yr] = table2robot(X, Y);
                         theta = rad2deg(theta);
                         c(found,:) = [Xr, Yr, theta, Realflavi,reachable(Xr,Yr)];
