@@ -1,6 +1,6 @@
 function clear_table()
     z_coor = 147;
-    offset = 6;
+    offset1 = 6;
 %     offset2 = 12;
     step = 0;
     adden = 0;
@@ -8,7 +8,7 @@ function clear_table()
     end_y = 0;
     
     n = 1;
-    sender('0');
+    sender('1');
     pause(0.5);
     while step<4
 %         if n == 1
@@ -48,7 +48,7 @@ function clear_table()
         
 %         TOio(1,1,0,0,300);
 %         pause(0.5);
-        c=TOrobot(x_coor_new,y_coor_new,(z_coor+offset),0,0,0);
+        c=TOrobot(x_coor_new,y_coor_new,(z_coor+6),0,0,0);
         if strcmp(c,'DONE');
             waiting;
             
@@ -62,7 +62,7 @@ function clear_table()
             if strcmp(c,'DONE');
                 waiting;
                 
-                TOio(0,0,0,0,300);
+                Toio(0,0,0,0,300);
                 pause(1.5);
                 sender('0');
                 pause(0.5);
@@ -84,7 +84,7 @@ function clear_table()
 end
 function waiting()
 c_loop ='RED';
-    while strcmp(c_loop,'GREEN')==0
+    while c_loop!= 'GREEN'
         c_loop = robSTAT;
     end
 end

@@ -6,7 +6,14 @@ function c = receive()
 try
 % The robot's IP address.
 % robot_IP_address = '192.168.2.1';
+
+% robot_IP_address = '192.168.0.230';
+
+% robot_IP_address = '127.0.0.1';
+% robot_IP_address = '192.168.0.5';
 robot_IP_address = '127.0.0.1';
+% robot_IP_address = '192.168.0.5';
+
 
 % The port that the robot will be listening on. This must be the same as in
 % your RAPID program.
@@ -31,15 +38,7 @@ c1 = char(fread(socket,4))';
 
 fclose(socket);
 %ensure that the special code are received
-if strcmp(c1,'REDE') == 1
-    
-    c = 'GREEN';
-elseif strcmp(c1,'BUSY') == 1
-    c= 'YELLOW';
-    
-else
-    c='RED';
-end
+c=c1;
 
 catch
     %if error
