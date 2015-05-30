@@ -1904,15 +1904,44 @@ try
     imgTable=getsnapshot(handles.vid1);     % capture image from video 1 (Table camera)
     set(handles.editCommand, 'string', 'Snaphot from Table Camera');
 catch
-    imgTable=imread('IMG_005.jpg');
+    imgTable=imread('IMG_011.jpg');
     set(handles.editCommand, 'string', 'Saved Image');
 end
 drawnow;
+[c]= findChocNoPlot(imgTable); %[Xr, Yr, theta, Realflavi,reachable(Xr,Yr)];
+% c = unique(c,'rows');
 
-[c]= findChocNoPlot(imgTable);
-c = unique(c,'rows');
-disp('DONE');
+% Set the PLACEs, milk;dark;orange;mint
+placePose = [200, 100, 0;...
+             200, 200, 0;...
+             200, 300, 0;...
+             200, 400, 0];
+n2pick = 0;
+for i = 4:-1:1
+    idFlav  = find(c(:,4)==i);
+    idReach = find(c(:,5)==1);
+    idGood  = intersect(idFlav,idReach);
+    
+    k = size(idGood);
+    k = k(1,1);
+    if k~=0
+        toPick(n2pick+1:n2pick+k,1:3)  = c(idGood,1:3);
+        for j = 1:k    
+            toPlace(n2pick+j,1:3) =  placePose(i,:);
+        end    
+        n2pick = n2pick + k;
+    end          
+end
+
+set(handles.pickTargetList,'data',toPick);
+set(handles.placeTargetList,'data',toPick);
+
+set(handles.nPickTargetShow,'string',num2str(n2pick));
+set(handles.nPlaceTargetShow,'string',num2str(n2pick));
+
 disp(c);
+runButton_Callback(hObject, eventdata, handles)
+disp('DONE');
 guidata(hObject, handles);
 
 
