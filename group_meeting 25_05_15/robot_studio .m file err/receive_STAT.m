@@ -6,12 +6,17 @@ function c = receive_STAT()
 try
 % The robot's IP address.
 % robot_IP_address = '192.168.2.1';
+<<<<<<< HEAD:group_meeting 25_05_15/robot_studio .m file err/receive_STAT.m
 <<<<<<< HEAD
 robot_IP_address = '192.168.0.230';
 =======
 % robot_IP_address = '127.0.0.1';
 robot_IP_address = '192.168.0.5';
 >>>>>>> origin/master
+=======
+% robot_IP_address = '127.0.0.1';
+robot_IP_address = '192.168.0.5';
+>>>>>>> origin/master:group_meeting 25_05_15/robot_studio .m file/receive_STAT.m
 
 % The port that the robot will be listening on. This must be the same as in
 % your RAPID program.
