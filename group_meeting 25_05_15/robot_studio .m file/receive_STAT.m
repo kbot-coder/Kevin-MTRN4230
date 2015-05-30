@@ -6,7 +6,8 @@ function c = receive_STAT()
 try
 % The robot's IP address.
 % robot_IP_address = '192.168.2.1';
-robot_IP_address = '127.0.0.1';
+% robot_IP_address = '127.0.0.1';
+robot_IP_address = '192.168.0.5';
 
 % The port that the robot will be listening on. This must be the same as in
 % your RAPID program.

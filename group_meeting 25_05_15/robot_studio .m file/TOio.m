@@ -44,7 +44,7 @@ function [c,pos_theta] = TOio(Tro_ON_int,Tro_RUN_int,Vac_ON_int,Vac_RUN_int,spee
                 c = 'DONE';
                 break;
                 
-            elseif strcmp(r3,'OKST') == 0
+            elseif strcmp(r2,'OKST') == 0
                 
             
             end
