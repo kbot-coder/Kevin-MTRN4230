@@ -1,7 +1,7 @@
 MODULE STATUS_ROB
     VAR socketdev client_socket;
     PERS bool ROBDONE;
-    PERS bool rob_stat:=TRUE;
+    PERS bool rob_stat:=FALSE;
     VAR bool ROBDONE_last:= TRUE;
     VAR num i:=0;
     CONST string host:="127.0.0.1";

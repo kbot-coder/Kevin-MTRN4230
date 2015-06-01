@@ -47,14 +47,14 @@ MODULE Task_1
     VAR robtarget temp;
 
         temp:=target;
-        temp.trans.z := target.trans.z +100;
+        temp.trans.z := target.trans.z;
           
          IF iWantThis = 0 THEN
                 !move 
                 
                 MoveJ temp, speed_value,fine,tSCup;
                 
-                MoveL target, speed_value, fine, tSCup;
+                !MoveL target, speed_value, fine, tSCup;
             
           ELSEIF iWantThis = 1  THEN
                 !move joint
