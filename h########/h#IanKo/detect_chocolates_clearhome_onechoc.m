@@ -7,7 +7,7 @@
 %chocolate detection.
 function c = detect_chocolates_clearhome_onechoc(im)
 c=[];
-% im = imread(im);
+ im = imread(im);
 
 %Initial Variable
 feaST = cell (120,1);
