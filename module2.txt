@@ -1,0 +1,98 @@
+MODULE TASK2BITCH
+   
+	
+    ! The socket connected to the client.
+    VAR socketdev client_socket;
+    VAR bool checkpos;
+    VAR bool checkjoint;
+    PERS  pos position:=[175,520,147];
+    PERS  robjoint jointpos:= [1,2,3,4,5,6];
+    PERS num mode :=0;
+    PERS bool startbitch := FALSE;
+    VAR num size;
+    VAR num wohoo := 0;
+    ! The host and port that we will be listening for a connection on.
+    CONST string host := "127.0.0.1";
+    CONST num port := 1025;
+    
+    
+    PROC MainServer()
+        
+        VAR string received_str;
+        wohoo:=1;
+       !jointpos:= [0,0,0,0,0,0];
+       !position:=[175,-520,147];
+        
+        ListenForAndAcceptConnection;
+         
+         !Receive a string from the client.
+        SocketReceive client_socket \Str:=received_str;
+            
+        ! Send the string back to the client, adding a line feed character.
+        !SocketSend client_socket \Str:=received_str ;
+        
+        !TPWrite (received_str);
+       ! size := StrLen(received_str);
+        bitchkachu received_str;
+            ! store value if it is x,y,z position
+           checkpos := StrtoVal(received_str,position);
+            ! store value if joint position.
+           !checkjoint := StrtoVal(received_str,jointpos);
+            
+           pleasebitch wohoo; 
+        
+        
+       
+      !  TPWrite (ValToStr(position));
+     ! TPWrite (ValToStr(jointpos));
+        CloseConnection;
+		
+    ENDPROC
+    
+    PROC pleasebitch(num wohoo)
+        IF wohoo = 1 THEN
+            startbitch:= TRUE;
+        ELSE
+            startbitch:=FALSE;
+        ENDIF
+        
+    
+    
+    ENDPROC
+    PROC bitchkachu(string received_str)
+        size := StrLen(received_str);
+            IF size =1 THEN
+                checkpos := StrtoVal(received_str,mode);
+                
+            else
+                checkpos := StrtoVal(received_str,position);
+                mode:=0;
+            ENDIF
+    ENDPROC
+    
+    PROC ListenForAndAcceptConnection()
+        
+        ! Create the socket to listen for a connection on.
+        VAR socketdev welcome_socket;
+        SocketCreate welcome_socket;
+        
+        ! Bind the socket to the host and port.
+        SocketBind welcome_socket, host, port;
+        
+        ! Listen on the welcome socket.
+        SocketListen welcome_socket;
+        
+        ! Accept a connection on the host and port.
+        SocketAccept welcome_socket, client_socket;
+        
+        ! Close the welcome socket, as it is no longer needed.
+        SocketClose welcome_socket;
+        
+    ENDPROC
+    
+    ! Close the connection to the client.
+    PROC CloseConnection()
+        SocketClose client_socket;
+    ENDPROC
+		
+ENDMODULE
